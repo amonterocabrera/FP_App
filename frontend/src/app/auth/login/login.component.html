@@ -1,93 +1,153 @@
-<div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="flex justify-center">
-      <div class="h-12 w-12 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
-        <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
+<!-- ══ HERO WRAPPER ══ -->
+<div class="fp-hero">
+
+  <!-- Background layers -->
+  <div class="fp-glow fp-glow--1"></div>
+  <div class="fp-glow fp-glow--2"></div>
+  <div class="fp-grid"></div>
+  <div class="fp-stripe"></div>
+
+  <!-- NAV -->
+  <nav class="fp-nav">
+    <div class="fp-nav__brand">
+      <div class="fp-nav__logo-wrap">
+        <img src="assets/fp_logo_oficial.png" alt="Fuerza del Pueblo" class="fp-nav__logo-img" />
       </div>
     </div>
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-      GestionElectoral <span class="text-primary-600">Portal</span>
-    </h2>
-    <p class="mt-2 text-center text-sm text-slate-600">
-      Acceso Administrativo
-    </p>
-  </div>
+    <div class="fp-nav__pill">Gestión Electoral</div>
+  </nav>
 
-  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10 border border-slate-100">
-      <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        
-        <!-- Error Alert -->
-        <div *ngIf="error" class="rounded-md bg-red-50 p-4 border border-red-200">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <!-- Heroicon name: solid/x-circle -->
-              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">
-                Error de Autenticación
-              </h3>
-              <div class="mt-2 text-sm text-red-700">
-                <p>{{ error }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+  <!-- CENTER CONTENT -->
+  <div class="fp-inner">
 
-        <div>
-          <label for="email" class="input-label"> Correo Electrónico </label>
-          <div class="mt-1">
-            <input id="email" formControlName="email" type="email" autocomplete="email" required class="input-field" 
-              [ngClass]="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': submitted && f['email'].errors }">
-          </div>
-          <div *ngIf="submitted && f['email'].errors" class="mt-1 text-sm text-red-600">
-            <div *ngIf="f['email'].errors['required']">El email es requerido</div>
-            <div *ngIf="f['email'].errors['email']">El formato debe ser válido</div>
-          </div>
-        </div>
-
-        <div>
-           <label for="password" class="input-label"> Contraseña </label>
-          <div class="mt-1">
-            <input id="password" formControlName="password" type="password" autocomplete="current-password" required class="input-field"
-               [ngClass]="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': submitted && f['password'].errors }">
-          </div>
-           <div *ngIf="submitted && f['password'].errors" class="mt-1 text-sm text-red-600">
-            <div *ngIf="f['password'].errors['required']">La contraseña es requerida</div>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <input id="rememberMe" formControlName="rememberMe" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-slate-300 rounded">
-            <label for="rememberMe" class="ml-2 block text-sm text-slate-900">
-              Recordarme
-            </label>
-          </div>
-
-          <div class="text-sm">
-            <a href="#" class="font-medium text-primary-600 hover:text-primary-500">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
-        </div>
-
-        <div>
-          <button type="submit" [disabled]="loading" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
-            <svg *ngIf="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span *ngIf="!loading">Iniciar Sesión</span>
-            <span *ngIf="loading">Validando...</span>
-          </button>
-        </div>
-      </form>
+    <!-- Slogan block -->
+    <div class="fp-slogan">
+      <div class="fp-eyebrow">
+        <span class="fp-dot"></span>
+        Sistema Administrativo · Acceso Seguro
+      </div>
+      <div class="fp-slogan__big">Gestión <span class="fp-slogan__accent">Electoral</span></div>
+      <p class="fp-slogan__desc">
+        Accede al sistema de gestión electoral de Fuerza del Pueblo. Administra recintos, miembros y actas de forma segura y eficiente.
+      </p>
     </div>
-  </div>
-</div>
+
+    <!-- FORM CARD -->
+    <div class="fp-card">
+
+      <div class="fp-card__label">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="3" width="14" height="10" rx="2" stroke="#1A6B20" stroke-width="1.5"/>
+          <circle cx="5" cy="8" r="1.5" fill="#1A6B20"/>
+          <line x1="9" y1="6.5" x2="13" y2="6.5" stroke="#1A6B20" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="9" y1="9" x2="11" y2="9" stroke="#1A6B20" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Credenciales de acceso
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off">
+
+        <!-- Error alert -->
+        <div *ngIf="error" class="fp-err fp-err--on">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#C62828" stroke-width="1.5"/>
+            <line x1="8" y1="5" x2="8" y2="9" stroke="#C62828" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="11.5" r=".7" fill="#C62828"/>
+          </svg>
+          {{ error }}
+        </div>
+
+        <!-- Email -->
+        <div class="fp-inp-wrap">
+          <svg class="fp-inp-ico" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1.5" y="3.5" width="15" height="11" rx="2" stroke="#2DB035" stroke-width="1.5"/>
+            <path d="M1.5 6l7.5 5 7.5-5" stroke="#2DB035" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="fp-inp"
+            placeholder="correo@ejemplo.com"
+            autocomplete="email"
+          >
+          <div *ngIf="submitted && f['email'].errors" class="fp-field-err">
+            <span *ngIf="f['email'].errors['required']">El correo es requerido</span>
+            <span *ngIf="f['email'].errors['email']">Formato de correo inválido</span>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="fp-inp-wrap">
+          <svg class="fp-inp-ico" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="4" y="8" width="10" height="8" rx="1.5" stroke="#2DB035" stroke-width="1.5"/>
+            <path d="M6 8V6a3 3 0 016 0v2" stroke="#2DB035" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="9" cy="12" r="1" fill="#2DB035"/>
+          </svg>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="fp-inp"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          >
+          <div *ngIf="submitted && f['password'].errors" class="fp-field-err">
+            <span *ngIf="f['password'].errors['required']">La contraseña es requerida</span>
+          </div>
+        </div>
+
+        <!-- Remember + forgot -->
+        <div class="fp-row">
+          <label class="fp-check-label">
+            <input type="checkbox" formControlName="rememberMe" id="rememberMe" class="fp-check">
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="fp-forgot">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Submit -->
+        <button
+          id="btn-login"
+          type="submit"
+          class="fp-btn"
+          [class.fp-btn--loading]="loading"
+          [disabled]="loading"
+        >
+          <svg *ngIf="loading" class="fp-spinner" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,.3)" stroke-width="2.5"/>
+            <path d="M10 2a8 8 0 018 8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <svg *ngIf="!loading" width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M3 9h12M11 5l4 4-4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ loading ? 'Validando...' : 'Iniciar Sesión' }}</span>
+        </button>
+
+      </form>
+
+      <p class="fp-hint">Acceso restringido · Solo personal autorizado</p>
+    </div>
+
+  </div><!-- /fp-inner -->
+
+  <!-- STATS BAR -->
+  <div class="fp-stats">
+    <div class="fp-stat">
+      <span class="fp-stat__num">60+</span>
+      <span class="fp-stat__lbl">Recintos activos</span>
+    </div>
+    <div class="fp-stat">
+      <span class="fp-stat__num">7M+</span>
+      <span class="fp-stat__lbl">Miembros registrados</span>
+    </div>
+    <div class="fp-stat">
+      <span class="fp-stat__num">2026</span>
+      <span class="fp-stat__lbl">Año electoral</span>
+    </div>
+    <div class="fp-stat">
+      <span class="fp-stat__num">RD</span>
+      <span class="fp-stat__lbl">República Dominicana</span>
+    </div><!-- /fp-stats -->
+
+</div><!-- /fp-hero -->

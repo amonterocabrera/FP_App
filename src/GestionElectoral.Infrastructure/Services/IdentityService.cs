@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using GestionElectoral.Application.Common.Interfaces;
 using GestionElectoral.Application.Common.Models;
 using GestionElectoral.Domain.Entities.Identity;
+using GestionElectoral.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,146 +21,276 @@ namespace GestionElectoral.Infrastructure.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _db;
 
-        public IdentityService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public IdentityService(
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _db = db;
         }
 
+        // ─────────────────────────────────────────────
+        // LOGIN con Lockout real
+        // ─────────────────────────────────────────────
         public async Task<AuthResult> LoginAsync(string email, string password, bool rememberMe)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null || !user.IsActive || user.IsDeleted)
+
+            if (user == null || user.IsDeleted)
+                return AuthResult.Fail("Credenciales inválidas.");
+
+            if (!user.IsActive)
+                return AuthResult.Fail("La cuenta está desactivada. Contacte al administrador.");
+
+            // Verificar si está bloqueado actualmente
+            if (await _userManager.IsLockedOutAsync(user))
             {
-                return new AuthResult { Succeeded = false, Errors = ["Credenciales inválidas o cuenta desactivada."] };
+                var until = user.LockoutEnd?.ToLocalTime().ToString("HH:mm") ?? "unos minutos";
+                return AuthResult.Fail($"Cuenta bloqueada. Intente nuevamente a las {until}.");
             }
 
-            var result = await _userManager.CheckPasswordAsync(user, password);
-            if (!result)
+            // Verificar contraseña — Identity NO incrementa AccessFailedCount automáticamente con CheckPasswordAsync
+            var passwordOk = await _userManager.CheckPasswordAsync(user, password);
+            if (!passwordOk)
             {
-                return new AuthResult { Succeeded = false, Errors = ["Credenciales inválidas."] };
+                // Incrementar contador (al llegar a 5 Identity bloquea automáticamente)
+                await _userManager.AccessFailedAsync(user);
+
+                // Leer estado fresco para saber si ya se bloqueó
+                var refreshed = await _userManager.FindByIdAsync(user.Id);
+                if (refreshed != null && await _userManager.IsLockedOutAsync(refreshed))
+                    return AuthResult.Fail("Cuenta bloqueada por 15 minutos por exceso de intentos.");
+
+                var remaining = _userManager.Options.Lockout.MaxFailedAccessAttempts - (user.AccessFailedCount + 1);
+                return AuthResult.Fail($"Contraseña incorrecta. {Math.Max(0, remaining)} intento(s) restante(s).");
             }
 
-            // Expiración si remember me (30 días), de lo contrario 1 hora
-            var tokenString = await GenerateJwtTokenAsync(user, rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(1));
-            var refreshToken = GenerateRefreshToken();
-            
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTimeOffset.UtcNow.Add(rememberMe ? TimeSpan.FromDays(60) : TimeSpan.FromDays(1)); // Refresh Token lifespan
-            
+            // Login correcto → resetear contador
+            await _userManager.ResetAccessFailedCountAsync(user);
+
+            var tokenExpiry = rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(8);
+            var token = await GenerateJwtTokenAsync(user, tokenExpiry);
+            var refresh = GenerateRefreshToken();
+
+            user.RefreshToken = refresh;
+            user.RefreshTokenExpiry = DateTimeOffset.UtcNow.Add(
+                rememberMe ? TimeSpan.FromDays(60) : TimeSpan.FromDays(1));
             await _userManager.UpdateAsync(user);
 
-            return new AuthResult { Succeeded = true, Token = tokenString, RefreshToken = refreshToken };
+            var session = await BuildSessionAsync(user);
+
+            return AuthResult.Ok(token, refresh, user.MustChangePassword, session);
         }
 
-        public async Task<AuthResult> RegisterAsync(string email, string password, string nombre, string apellido)
-        {
-            var user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                Nombre = nombre,
-                Apellido = apellido,
-                IsActive = true
-            };
-
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result.Succeeded)
-            {
-                return new AuthResult { Succeeded = true };
-            }
-
-            return new AuthResult
-            {
-                Succeeded = false,
-                Errors = result.Errors.Select(e => e.Description).ToArray()
-            };
-        }
-
+        // ─────────────────────────────────────────────
+        // REFRESH TOKEN
+        // ─────────────────────────────────────────────
         public async Task<AuthResult> RefreshTokenAsync(string token, string refreshToken)
         {
-            // First we decode token to get the user ID without validating the expiration
             var principal = GetPrincipalFromExpiredToken(token);
             if (principal == null)
-            {
-                 return new AuthResult { Succeeded = false, Errors = ["Token inválido."] };
-            }
+                return AuthResult.Fail("Token inválido.");
 
             var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) 
-                 return new AuthResult { Succeeded = false, Errors = ["Token inválido."] };
+            if (userId == null) return AuthResult.Fail("Token inválido.");
 
             var user = await _userManager.FindByIdAsync(userId);
-
             if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry <= DateTimeOffset.UtcNow)
-            {
-                return new AuthResult { Succeeded = false, Errors = ["Token de refresco inválido o expirado."] };
-            }
+                return AuthResult.Fail("Refresh token inválido o expirado.");
 
-            var newJwtToken = await GenerateJwtTokenAsync(user, TimeSpan.FromHours(1));
-            var newRefreshToken = GenerateRefreshToken();
+            var newToken = await GenerateJwtTokenAsync(user, TimeSpan.FromHours(8));
+            var newRefresh = GenerateRefreshToken();
 
-            user.RefreshToken = newRefreshToken;
+            user.RefreshToken = newRefresh;
+            user.RefreshTokenExpiry = DateTimeOffset.UtcNow.AddDays(1);
             await _userManager.UpdateAsync(user);
 
-            return new AuthResult { Succeeded = true, Token = newJwtToken, RefreshToken = newRefreshToken };
+            var session = await BuildSessionAsync(user);
+            return AuthResult.Ok(newToken, newRefresh, user.MustChangePassword, session);
+        }
+
+        // ─────────────────────────────────────────────
+        // LOGOUT: revocar refresh token
+        // ─────────────────────────────────────────────
+        public async Task<AuthResult> LogoutAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return AuthResult.Fail("Usuario no encontrado.");
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+            await _userManager.UpdateAsync(user);
+
+            return new AuthResult { Succeeded = true };
+        }
+
+        // ─────────────────────────────────────────────
+        // CAMBIAR CONTRASEÑA (usuario mismo)
+        // ─────────────────────────────────────────────
+        public async Task<AuthResult> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return AuthResult.Fail("Usuario no encontrado.");
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+                return AuthResult.Fail(result.Errors.Select(e => e.Description).ToArray());
+
+            user.MustChangePassword = false;
+            await _userManager.UpdateAsync(user);
+            return new AuthResult { Succeeded = true };
+        }
+
+        // ─────────────────────────────────────────────
+        // RESET DE CONTRASEÑA (admin)
+        // ─────────────────────────────────────────────
+        public async Task<AuthResult> AdminResetPasswordAsync(
+            string userId, string newPassword, bool mustChange, string requestedBy)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return AuthResult.Fail("Usuario no encontrado.");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            if (!result.Succeeded)
+                return AuthResult.Fail(result.Errors.Select(e => e.Description).ToArray());
+
+            user.MustChangePassword = mustChange;
+            user.UpdatedBy = requestedBy;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
+            await _userManager.UpdateAsync(user);
+            return new AuthResult { Succeeded = true };
+        }
+
+        // ─────────────────────────────────────────────
+        // PERFIL AUTENTICADO (/me)
+        // ─────────────────────────────────────────────
+        public async Task<UserSessionDto?> GetMeAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null || user.IsDeleted) return null;
+            return await BuildSessionAsync(user);
+        }
+
+        // ─────────────────────────────────────────────
+        // HELPERS PRIVADOS
+        // ─────────────────────────────────────────────
+        private async Task<UserSessionDto> BuildSessionAsync(ApplicationUser user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var permisos = await GetPermisosAsync(roles);
+            var modulos = await GetModulosAsync(roles);
+
+            return new UserSessionDto
+            {
+                Id = user.Id,
+                Nombre = user.Nombre,
+                Apellido = user.Apellido,
+                Email = user.Email!,
+                Roles = roles.ToList(),
+                Permisos = permisos,
+                Modulos = modulos
+            };
+        }
+
+        private async Task<List<string>> GetPermisosAsync(IList<string> roles)
+        {
+            if (!roles.Any()) return new List<string>();
+
+            return await _db.RolPermisos
+                .AsNoTracking()
+                .Include(rp => rp.Rol)
+                .Include(rp => rp.Permiso)
+                .Where(rp => roles.Contains(rp.Rol.Name!) && rp.IsActive)
+                .Select(rp => rp.Permiso.Clave)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        private async Task<List<ModuloSessionDto>> GetModulosAsync(IList<string> roles)
+        {
+            if (!roles.Any()) return new List<ModuloSessionDto>();
+
+            return await _db.RolPermisos
+                .AsNoTracking()
+                .Include(rp => rp.Rol)
+                .Include(rp => rp.Permiso)
+                    .ThenInclude(p => p.Modulo)
+                .Where(rp => roles.Contains(rp.Rol.Name!) && rp.IsActive)
+                .Select(rp => rp.Permiso.Modulo)
+                .Distinct()
+                .OrderBy(m => m.Orden)
+                .Select(m => new ModuloSessionDto
+                {
+                    Id = m.Id,
+                    Nombre = m.Nombre,
+                    Ruta = m.Ruta,
+                    Icono = m.Icono,
+                    Orden = m.Orden
+                })
+                .ToListAsync();
         }
 
         private async Task<string> GenerateJwtTokenAsync(ApplicationUser user, TimeSpan expires)
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            
+            var roles = await _userManager.GetRolesAsync(user);
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Email, user.Email!)
+                new(JwtRegisteredClaimNames.Sub,   user.Id),
+                new(JwtRegisteredClaimNames.Email, user.Email!),
+                new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+                new("nombre",               user.Nombre),
+                new("apellido",             user.Apellido),
+                new("must_change_password", user.MustChangePassword.ToString().ToLower()),
             };
 
-            foreach (var role in userRoles)
-            {
+            foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!));
+            var key   = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.Add(expires),
-                signingCredentials: creds
-            );
+            var jwtToken = new JwtSecurityToken(
+                issuer:             _configuration["JwtSettings:Issuer"],
+                audience:           _configuration["JwtSettings:Audience"],
+                claims:             claims,
+                expires:            DateTime.UtcNow.Add(expires),
+                signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
 
-        private string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
-            var randomNumber = new byte[32];
+            var bytes = new byte[64];
             using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes);
         }
 
         private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
-            var tokenValidationParameters = new TokenValidationParameters
+            var parameters = new TokenValidationParameters
             {
-                ValidateAudience = false,
-                ValidateIssuer = false,
+                ValidateAudience         = false,
+                ValidateIssuer           = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!)),
-                ValidateLifetime = false // Que permita validar un token vencido
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!)),
+                ValidateLifetime = false // permite tokens vencidos
             };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
+            var handler   = new JwtSecurityTokenHandler();
+            var principal = handler.ValidateToken(token, parameters, out var securityToken);
+
+            if (securityToken is not JwtSecurityToken jwt ||
+                !jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.OrdinalIgnoreCase))
+                return null;
 
             return principal;
         }

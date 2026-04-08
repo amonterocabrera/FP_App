@@ -1,46 +1,88 @@
-<ion-content [fullscreen]="true" [scrollY]="false">
-
-  <div class="header-section">
-    <div class="fp-brand-container">
-      <img src="assets/logo_fp_full_color.png" alt="Fuerza del Pueblo" class="fp-logo-main" />
-    </div>
-  </div>
-
-  <div class="content-body">
-    <div class="welcome-text">
-      <h2 class="greeting">¡Bienvenido!</h2>
-      <p class="subtitle">Plataforma Electoral</p>
-    </div>
-
-    <div class="form-container">
-      <div class="input-group">
-        <div class="icon-wrapper">
-          <ion-icon name="person-outline"></ion-icon>
+<ion-content [fullscreen]="true">
+  <div class="login-container">
+    <div class="grid-overlay"></div>
+    <header class="login-header">
+      <div class="logo-horizontal-wrapper">
+        <img src="assets/fp-logo.png" alt="Icono FP" class="main-logo-icon" />
+        <div class="logo-divider"></div>
+        <div class="logo-text">
+          <span class="fuerza">FUERZA</span>
+          <span class="del-pueblo">DEL PUEBLO</span>
         </div>
-        <input type="email" class="fp-input" placeholder="Correo electrónico" [(ngModel)]="loginData.email" />
+      </div>
+      <div class="system-title">
+        <h1>GESTIÓN <span>ELECTORAL</span></h1>
+        <p class="tagline">SISTEMA ADMINISTRATIVO • 2026</p>
+      </div>
+    </header>
+
+    <main class="login-card">
+      <div class="card-header">
+        <ion-icon name="finger-print-outline"></ion-icon>
+        <span>ACCESO AL SISTEMA</span>
       </div>
 
-      <div class="input-group">
-        <div class="icon-wrapper">
-          <ion-icon name="lock-closed-outline"></ion-icon>
-        </div>
-        <input [type]="showPassword ? 'text' : 'password'" class="fp-input" placeholder="Contraseña"
-          [(ngModel)]="loginData.password" />
-        <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="icon-right"
-          (click)="togglePassword()"></ion-icon>
+      <!-- Erros/Success -->
+      <div class="fp-alert fp-alert--error" *ngIf="toastMessage && isError"
+        style="background:#FFF0F0; border:1px solid #FFCDD2; color:#C62828; padding:8px 12px; border-radius:8px; font-size:12px; margin-bottom:15px;">
+        {{ toastMessage }}
+      </div>
+      <div class="fp-alert fp-alert--ok" *ngIf="toastMessage && !isError"
+        style="background:#F0FFF0; border:1px solid #C8E8C9; color:#1A6B20; padding:8px 12px; border-radius:8px; font-size:12px; margin-bottom:15px;">
+        {{ toastMessage }}
       </div>
 
-      <button class="fp-button" (click)="login()" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Iniciar Sesión</span>
-        <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
-      </button>
+      <div class="form-body">
+        <div class="input-field">
+          <ion-icon name="person-outline" class="field-icon"></ion-icon>
+          <input type="email" placeholder="Correo electrónico" [(ngModel)]="loginData.email" autocomplete="email"
+            inputmode="email">
+        </div>
 
-      <p class="forgot" (click)="forgotPassword()">¿Olvidaste tu contraseña?</p>
-    </div>
+        <div class="input-field">
+          <ion-icon name="lock-closed-outline" class="field-icon"></ion-icon>
+          <input [type]="showPassword ? 'text' : 'password'" placeholder="Contraseña" [(ngModel)]="loginData.password"
+            autocomplete="current-password">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="toggle-pwd"
+            (click)="togglePassword()"></ion-icon>
+        </div>
 
-    <div class="message-container" *ngIf="toastMessage" [class.error]="isError">
-      {{ toastMessage }}
-    </div>
+        <a class="forgot-link" (click)="forgotPassword()">¿Olvidaste tu contraseña?</a>
+
+        <button class="btn-login" (click)="login()" [disabled]="isLoading">
+          <ion-spinner name="crescent" *ngIf="isLoading" style="height: 20px; --color: white;"></ion-spinner>
+          <ng-container *ngIf="!isLoading">
+            <span>INICIAR SESIÓN</span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </ng-container>
+        </button>
+
+        <div class="security-badge">
+          <ion-icon name="lock-closed"></ion-icon>
+          <span>Conexión segura • Protección de datos</span>
+        </div>
+      </div>
+    </main>
+
+    <footer class="login-footer">
+      <div class="stat-item">
+        <ion-icon name="location-outline" class="stat-icon"></ion-icon>
+        <span class="stat-value">60+</span>
+        <span class="stat-label">RECINTOS</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <ion-icon name="people-outline" class="stat-icon"></ion-icon>
+        <span class="stat-value">7M+</span>
+        <span class="stat-label">MIEMBROS</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <ion-icon name="calendar-outline" class="stat-icon"></ion-icon>
+        <span class="stat-value">2026</span>
+        <span class="stat-label">AÑO ELECTORAL</span>
+      </div>
+    </footer>
+
   </div>
-
 </ion-content>

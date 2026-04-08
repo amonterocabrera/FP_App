@@ -50,8 +50,8 @@ namespace GestionElectoral.Infrastructure.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime?>("FechaNacimiento")
                         .HasColumnType("datetime2");
@@ -70,10 +70,6 @@ namespace GestionElectoral.Infrastructure.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("Telefono")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -86,6 +82,62 @@ namespace GestionElectoral.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Personas");
+                });
+
+            modelBuilder.Entity("GestionElectoral.Domain.Entities.Core.PersonaContacto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("EsPrincipal")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nota")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid>("PersonaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Valor")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonaId", "Tipo", "Valor")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PersonaContacto_Unique");
+
+                    b.ToTable("PersonaContactos");
                 });
 
             modelBuilder.Entity("GestionElectoral.Domain.Entities.Identity.ApplicationRole", b =>
@@ -180,6 +232,9 @@ namespace GestionElectoral.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -194,6 +249,9 @@ namespace GestionElectoral.Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PersonaId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -480,6 +538,17 @@ namespace GestionElectoral.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GestionElectoral.Domain.Entities.Core.PersonaContacto", b =>
+                {
+                    b.HasOne("GestionElectoral.Domain.Entities.Core.Persona", "Persona")
+                        .WithMany("Contactos")
+                        .HasForeignKey("PersonaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Persona");
+                });
+
             modelBuilder.Entity("GestionElectoral.Domain.Entities.Security.Permiso", b =>
                 {
                     b.HasOne("GestionElectoral.Domain.Entities.Security.Modulo", "Modulo")
@@ -559,6 +628,11 @@ namespace GestionElectoral.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GestionElectoral.Domain.Entities.Core.Persona", b =>
+                {
+                    b.Navigation("Contactos");
                 });
 
             modelBuilder.Entity("GestionElectoral.Domain.Entities.Security.Modulo", b =>

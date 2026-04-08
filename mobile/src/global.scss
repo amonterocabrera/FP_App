@@ -26,12 +26,25 @@
 @import "@ionic/angular/css/flex-utils.css";
 
 /**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
+ * Ionic Dark Mode — disabled, our design uses a custom green dark theme
+ * For more info: https://ionicframework.com/docs/theming/dark-mode
  */
-
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+/* ═══════════════════════════════════════════════════
+   FUERZA DEL PUEBLO — Global Typography Reset
+   ═══════════════════════════════════════════════════ */
+* { box-sizing: border-box; }
+
+html, body {
+  font-family: 'Montserrat', var(--ion-font-family), sans-serif;
+  overscroll-behavior: none;
+}
+
+/* Ensure ion-content takes full background on pages using green theme */
+ion-app {
+  font-family: 'Montserrat', sans-serif;
+}
+

@@ -24,6 +24,7 @@ namespace GestionElectoral.Infrastructure.Persistence
         public DbSet<Permiso> Permisos => Set<Permiso>();
         public DbSet<RolPermiso> RolPermisos => Set<RolPermiso>();
         public DbSet<Persona> Personas => Set<Persona>();
+        public DbSet<PersonaContacto> PersonaContactos => Set<PersonaContacto>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -27,12 +27,20 @@ namespace GestionElectoral.Infrastructure
             // 3. Identity
             services.AddIdentityCore<ApplicationUser>(options =>
             {
+                // Política de contraseñas
                 options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 6;
-                options.Password.RequireLowercase = false;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.User.RequireUniqueEmail = false;
+
+                // Email único por usuario
+                options.User.RequireUniqueEmail = true;
+
+                // ✅ Lockout: bloquear tras 5 intentos por 15 minutos
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
             })
             .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

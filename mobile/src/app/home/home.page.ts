@@ -1,14 +1,20 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonContent, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../core/services/auth.service';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
   lockClosedOutline,
   eyeOutline,
-  eyeOffOutline
+  eyeOffOutline,
+  arrowForwardOutline,
+  lockClosed,
+  locationOutline,
+  peopleOutline,
+  calendarOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -25,10 +31,11 @@ export class HomePage {
   isLoading = false;
   showPassword = false;
 
-  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   constructor() {
-    addIcons({ personOutline, lockClosedOutline, eyeOutline, eyeOffOutline });
+    addIcons({ personOutline, lockClosedOutline, eyeOutline, eyeOffOutline, arrowForwardOutline, lockClosed, locationOutline, peopleOutline, calendarOutline });
   }
 
   togglePassword() {
@@ -50,16 +57,34 @@ export class HomePage {
     this.isLoading = true;
     this.toastMessage = '';
 
-    this.http.post<any>('http://localhost:5144/api/auth/login', this.loginData).subscribe({
+    this.authService.login({ 
+      email: this.loginData.email, 
+      password: this.loginData.password 
+    }).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.toastMessage = '¡Acceso exitoso! Redirigiendo...';
-        this.isError = false;
-        localStorage.setItem('token', res.token);
+        if (res.succeeded) {
+          this.toastMessage = '¡Acceso exitoso! Redirigiendo...';
+          this.isError = false;
+          
+          setTimeout(() => {
+            if (res.mustChangePassword) {
+              // Si debemos forzar el cambio de password, redireccionar a esa vista
+              this.router.navigate(['/change-password'], { replaceUrl: true });
+            } else {
+              this.router.navigate(['/users'], { replaceUrl: true });
+            }
+          }, 500);
+        } else {
+          // Failure but still 200 OK (e.g. lockout or incorrect credentials returned normally)
+          this.toastMessage = res.errors?.[0] || 'Credenciales incorrectas';
+          this.isError = true;
+        }
       },
       error: (err) => {
         this.isLoading = false;
-        this.toastMessage = err.error?.errors?.[0] || 'Credenciales incorrectas';
+        // The backend returns 401 with { errors: [...] } format for wrong passwords and lockouts
+        this.toastMessage = err.error?.errors?.[0] || err.error?.error || 'Credenciales incorrectas';
         this.isError = true;
       }
     });

@@ -14,8 +14,8 @@ namespace GestionElectoral.Application.Features.Personas.Queries.BuscarEnPadron
         public string Apellido1 { get; set; } = string.Empty;
         public string Apellido2 { get; set; } = string.Empty;
 
-        /// <summary>1 = Masculino, 2 = Femenino (según codificación JCE).</summary>
-        public int IdSexo { get; set; }
+        /// <summary>1 = Masculino, 2 = Femenino (según codificación JCE) o M/F directamente de la DB.</summary>
+        public string IdSexo { get; set; } = string.Empty;
 
         public DateTime? FechaNacimiento { get; set; }
 
@@ -26,6 +26,6 @@ namespace GestionElectoral.Application.Features.Personas.Queries.BuscarEnPadron
             $"{Nombres} {Apellido1} {Apellido2}".Trim();
 
         /// <summary>Genero mapeado al enum del dominio.</summary>
-        public string Genero => IdSexo == 2 ? "F" : "M";
+        public string Genero => IdSexo == "2" || IdSexo?.ToUpper() == "F" ? "F" : "M";
     }
 }

@@ -1,15 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonButton,
   IonIcon, IonSearchbar, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions,
   IonItemOption, IonRefresher, IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent,
-  AlertController, ToastController
+  AlertController, ToastController, IonAvatar, IonSkeletonText, IonFab, IonFabButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, peopleOutline, mailOutline, callOutline, trashOutline } from 'ionicons/icons';
+import { addCircleOutline, peopleOutline, mailOutline, callOutline, trashOutline, personAddOutline, pencilOutline, addOutline, searchOutline, closeOutline, arrowBackOutline } from 'ionicons/icons';
 import { PersonasService, Persona } from '../../core/services/personas.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-personas-list',
@@ -20,12 +21,15 @@ import { PersonasService, Persona } from '../../core/services/personas.service';
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonButton,
     IonIcon, IonSearchbar, IonList, IonItemSliding, IonItem, IonLabel, IonBadge, IonItemOptions,
     IonItemOption, IonRefresher, IonRefresherContent, IonInfiniteScroll, IonInfiniteScrollContent,
-    CommonModule, RouterModule
+    IonAvatar, IonSkeletonText, IonFab, IonFabButton, CommonModule, RouterModule
   ]
 })
 export class PersonasListComponent implements OnInit {
+  @ViewChild('searchBar', { static: false }) searchBar!: IonSearchbar;
+  
   personas: Persona[] = [];
   isLoading = false;
+  showSearch = false;
   
   // Paginación
   pageNumber = 1;
@@ -38,7 +42,7 @@ export class PersonasListComponent implements OnInit {
   private toastCtrl = inject(ToastController);
 
   constructor() {
-    addIcons({ addCircleOutline, peopleOutline, mailOutline, callOutline, trashOutline });
+    addIcons({ addCircleOutline, peopleOutline, mailOutline, callOutline, trashOutline, personAddOutline, pencilOutline, addOutline, searchOutline, closeOutline, arrowBackOutline });
   }
 
   ngOnInit() {
@@ -77,6 +81,21 @@ export class PersonasListComponent implements OnInit {
     this.searchTerm = event.target.value?.toLowerCase() || '';
     this.pageNumber = 1;
     this.loadPersonas();
+  }
+
+  toggleSearch() {
+    this.showSearch = !this.showSearch;
+    if (this.showSearch) {
+      setTimeout(() => {
+        this.searchBar?.setFocus();
+      }, 150); // Pequeño delay de animación
+    } else {
+      if (this.searchTerm !== '') {
+        this.searchTerm = '';
+        this.pageNumber = 1;
+        this.loadPersonas();
+      }
+    }
   }
 
   doRefresh(event: any) {
@@ -118,5 +137,22 @@ export class PersonasListComponent implements OnInit {
       message, duration: 2500, color, position: 'bottom'
     });
     await toast.present();
+  }
+
+  getFotoUrl(cedula: string): string {
+    return `${environment.apiUrl}/personas/${cedula}/foto`;
+  }
+
+  handleImageError(event: any) {
+    const imgElement = event.target;
+    imgElement.style.display = 'none';
+    
+    // El siguiente elemento debería ser el ng-template (invisible) 
+    // y el subsiguiente el div .fallback-manual
+    const parent = imgElement.parentElement;
+    const fallbackManual = parent.querySelector('.fallback-manual');
+    if (fallbackManual) {
+      fallbackManual.style.display = 'flex';
+    }
   }
 }

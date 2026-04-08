@@ -7,6 +7,7 @@ import {
   IonItem, IonLabel, IonInput, IonButton, IonIcon, IonToggle, IonSpinner, ToastController 
 } from '@ionic/angular/standalone';
 import { UserService, User } from '../../services/user.service';
+import { AuthService } from '../../core/services/auth.service';
 import { addIcons } from 'ionicons';
 import { saveOutline, personOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 
@@ -48,6 +49,15 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit() {
     this.userId = this.route.snapshot.paramMap.get('id');
+    const authSvc = inject(AuthService);
+    
+    // Si entramos por /perfil, obtenemos nuestro propio ID
+    if (!this.userId && this.location.path().includes('perfil')) {
+      const me = authSvc.getCurrentUser();
+      if (me?.id) {
+        this.userId = me.id;
+      }
+    }
     
     if (this.userId) {
       this.isEditing = true;

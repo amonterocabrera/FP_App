@@ -43,6 +43,10 @@ export interface CrearPersonaRequest {
   email?: string;
   direccion?: string;
   contactos?: ContactoInputDto[];
+  nombre?: string;
+  apellido?: string;
+  genero?: string;
+  fechaNacimiento?: string;
 }
 
 export interface ActualizarPersonaRequest {
@@ -63,7 +67,7 @@ export interface ContactoInputDto {
 @Injectable({ providedIn: 'root' })
 export class PersonasService {
   private http   = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/api/personas`;
+  private apiUrl = `${environment.apiUrl}/personas`;
 
   getPersonas(
     busqueda: string = '',
@@ -79,8 +83,26 @@ export class PersonasService {
     return this.http.get<PersonasResult>(this.apiUrl, { params });
   }
 
+  getMisRegistros(
+    busqueda: string = '',
+    pagina: number   = 1,
+    tamPagina: number = 1000
+  ): Observable<PersonasResult> {
+    let params = new HttpParams()
+      .set('pagina', pagina.toString())
+      .set('tamPagina', tamPagina.toString());
+
+    if (busqueda) params = params.set('busqueda', busqueda);
+
+    return this.http.get<PersonasResult>(`${this.apiUrl}/mis-registros`, { params });
+  }
+
   getPersona(id: string): Observable<Persona> {
     return this.http.get<Persona>(`${this.apiUrl}/${id}`);
+  }
+
+  getPersonaByCedula(cedula: string): Observable<Persona> {
+    return this.http.get<Persona>(`${this.apiUrl}/por-cedula/${cedula}`);
   }
 
   createPersona(payload: CrearPersonaRequest): Observable<{ id: string; cedula: string; nombreCompleto: string }> {

@@ -18,6 +18,12 @@ namespace GestionElectoral.Application.Features.Personas.Commands.CrearPersona
         // Campos opcionales que el operador puede agregar/completar
         public string? Email { get; set; }
         public string? Direccion { get; set; }
+        
+        // Campos para registro manual cuando no está en el PadronJCE
+        public string? Nombre { get; set; }
+        public string? Apellido { get; set; }
+        public Genero? Genero { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
 
         /// <summary>Contactos iniciales (teléfonos, WhatsApp, etc.).</summary>
         public List<ContactoInputDto> Contactos { get; set; } = new();

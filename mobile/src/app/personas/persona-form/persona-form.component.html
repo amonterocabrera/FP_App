@@ -7,7 +7,7 @@
       {{ isEditing ? 'Editar Persona' : 'Nueva Persona' }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="save()" [disabled]="isSaving || (!ciudadano && !isEditing)" fill="clear">
+      <ion-button (click)="save()" [disabled]="isSaving || (!ciudadano && !isEditing && !isManualMode)" fill="clear">
         <ion-spinner *ngIf="isSaving" name="dots" style="color:#fff;"></ion-spinner>
         <ion-icon *ngIf="!isSaving" name="save-outline" style="color:#fff; font-size:22px;"></ion-icon>
       </ion-button>
@@ -41,7 +41,9 @@
               formControlName="cedula"
               type="text"
               placeholder="001-0000000-1"
-              [readonly]="isEditing">
+              [readonly]="isEditing && personaId != null && route.snapshot.paramMap.get('id') != null"
+              clearInput="true"
+              (ionInput)="cedulaChanged($event)">
             </ion-input>
           </ion-item>
           <ion-button
@@ -58,6 +60,36 @@
           <ion-icon name="alert-circle-outline"></ion-icon>
           {{ padronError }}
         </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ── STEP 1b: Registro Manual (Activo solo si no se encuentra en Padron) ── -->
+    <ion-card class="fp-card" *ngIf="isManualMode && !isEditing">
+      <ion-card-header>
+        <ion-card-title class="section-title" style="color:var(--ion-color-warning)">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          Registro Manual Requerido
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="display:flex;flex-direction:column;gap:10px;">
+        <ion-item class="fp-input-item" fill="outline">
+          <ion-input label="Nombre(s)" labelPlacement="floating" formControlName="nombre" placeholder="Primer y segundo nombre"></ion-input>
+        </ion-item>
+        
+        <ion-item class="fp-input-item" fill="outline">
+          <ion-input label="Apellidos" labelPlacement="floating" formControlName="apellido" placeholder="Primer y segundo apellido"></ion-input>
+        </ion-item>
+
+        <ion-item class="fp-input-item" fill="outline">
+          <ion-select label="Género" labelPlacement="floating" formControlName="genero" interface="popover">
+            <ion-select-option value="M">👨 Masculino</ion-select-option>
+            <ion-select-option value="F">👩 Femenino</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="fp-input-item" fill="outline">
+          <ion-input label="Fecha Nacimiento" labelPlacement="floating" formControlName="fechaNacimiento" type="date"></ion-input>
+        </ion-item>
       </ion-card-content>
     </ion-card>
 
@@ -93,7 +125,7 @@
     </ion-card>
 
     <!-- ── STEP 3: Datos editables (solo se guardan en GestionElectoral) ──── -->
-    <ion-card class="fp-card" *ngIf="ciudadano || isEditing">
+    <ion-card class="fp-card" *ngIf="ciudadano || isEditing || isManualMode">
       <ion-card-header>
         <ion-card-title class="section-title">
           <ion-icon name="mail-outline"></ion-icon>
@@ -103,6 +135,7 @@
       <ion-card-content style="display:flex;flex-direction:column;gap:10px;">
 
         <ion-item class="fp-input-item" fill="outline">
+          <ion-icon slot="start" name="mail-outline" style="color: #64748b; padding-left: 8px; font-size:1.2rem;"></ion-icon>
           <ion-input
             label="Correo Electrónico"
             labelPlacement="floating"
@@ -113,6 +146,7 @@
         </ion-item>
 
         <ion-item class="fp-input-item" fill="outline">
+          <ion-icon slot="start" name="map-outline" style="color: #64748b; padding-left: 8px; font-size:1.2rem;"></ion-icon>
           <ion-input
             label="Dirección"
             labelPlacement="floating"
@@ -126,17 +160,13 @@
     </ion-card>
 
     <!-- ── STEP 4: Teléfonos / contactos ──────────────────────────────────── -->
-    <ion-card class="fp-card" *ngIf="ciudadano || isEditing">
+    <ion-card class="fp-card" *ngIf="ciudadano || isEditing || isManualMode">
       <ion-card-header>
         <div class="section-header-row">
           <ion-card-title class="section-title">
             <ion-icon name="call-outline"></ion-icon>
             Teléfonos
           </ion-card-title>
-          <ion-button fill="clear" size="small" (click)="agregarContacto()" class="add-btn">
-            <ion-icon name="add-outline" slot="start"></ion-icon>
-            Agregar
-          </ion-button>
         </div>
       </ion-card-header>
       <ion-card-content>
@@ -146,27 +176,63 @@
         </div>
 
         <div formArrayName="contactos" class="contactos-list">
-          <div *ngFor="let c of contactos.controls; let i = index" [formGroupName]="i" class="contacto-row">
+          <div *ngFor="let c of contactos.controls; let i = index" [formGroupName]="i" style="display:flex; flex-direction:column; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0;">
+            
+            <div style="display:flex; width: 100%; align-items: center; gap: 8px;">
+              <ion-input 
+                class="fp-input-item valor-input" 
+                fill="outline"
+                formControlName="valor" 
+                placeholder="(809) 000-0000" 
+                type="tel" 
+                maxlength="14" 
+                aria-label="Número de teléfono"
+                style="flex: 1;"
+                (ionInput)="formatPhone($event, i)">
+                <ion-icon slot="start" name="call-outline" style="color: #00A651; padding-left: 14px; font-size:1.3rem; margin-right: 8px;"></ion-icon>
+              </ion-input>
 
-            <ion-select class="tipo-select" formControlName="tipo" interface="popover">
-              <ion-select-option *ngFor="let t of tiposContacto" [value]="t.value">
-                {{ t.label }}
-              </ion-select-option>
-            </ion-select>
+              <ion-button *ngIf="c.value.valor" fill="clear" color="danger" (click)="eliminarContacto(i)" style="margin: 0; padding: 0;">
+                <ion-icon name="trash-outline" slot="icon-only" style="font-size: 1.4rem; opacity: 0.8;"></ion-icon>
+              </ion-button>
+            </div>
 
-            <ion-item class="fp-input-item valor-input" fill="outline">
-              <ion-input formControlName="valor" placeholder="+1 809 000 0000" type="tel"></ion-input>
-            </ion-item>
-
-            <ion-button fill="clear" color="danger" size="small" (click)="eliminarContacto(i)">
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-            </ion-button>
+            <div style="display:flex; flex-direction:row; flex-wrap: wrap; gap:16px; margin-top:12px; padding-left: 4px;">
+              <ion-checkbox formControlName="isPrincipal" style="--checkbox-background-checked: #10b981; font-size:0.85rem; font-weight:600; color:#334155; --size: 20px;">PRINCIPAL</ion-checkbox>
+              <ion-checkbox formControlName="isMovil" style="--checkbox-background-checked: #10b981; font-size:0.85rem; font-weight:600; color:#334155; --size: 20px;">MÓVIL</ion-checkbox>
+              <ion-checkbox formControlName="isWhatsApp" style="--checkbox-background-checked: #10b981; font-size:0.85rem; font-weight:600; color:#334155; --size: 20px;">WhatsApp</ion-checkbox>
+            </div>
 
           </div>
         </div>
 
+        <ion-button fill="clear" size="small" (click)="agregarContacto()" class="add-btn">
+          → AGREGAR OTRO TELÉFONO
+        </ion-button>
+
       </ion-card-content>
     </ion-card>
+
+    <!-- ── FOOTER ACTIONS ──────────────────────────────────────────── -->
+    <div style="display:flex; flex-direction:column; gap:16px; margin: 16px 0 32px 0;">
+      <ion-button 
+        expand="block" 
+        (click)="save()" 
+        [disabled]="isSaving || (!ciudadano && !isEditing && !isManualMode)" 
+        style="--background: #00A651; --border-radius: 30px; height: 56px; font-weight: bold;">
+        <ion-spinner *ngIf="isSaving" name="dots" color="light"></ion-spinner>
+        <span *ngIf="!isSaving">{{ isEditing ? 'ACTUALIZAR DATOS' : 'GUARDAR PERSONA' }}</span>
+        <ion-icon *ngIf="!isSaving" name="save-outline" slot="end"></ion-icon>
+      </ion-button>
+
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        routerLink="/personas" 
+        style="--border-radius: 30px; height: 56px; --color: #64748b; font-weight: bold;">
+        REGRESAR AL LISTADO
+      </ion-button>
+    </div>
 
   </form>
 </ion-content>

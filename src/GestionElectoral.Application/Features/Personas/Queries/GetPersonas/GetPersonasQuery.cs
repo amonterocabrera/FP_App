@@ -9,7 +9,8 @@ namespace GestionElectoral.Application.Features.Personas.Queries.GetPersonas
     public record GetPersonasQuery(
         string? Busqueda = null,
         int Pagina = 1,
-        int TamPagina = 20)
+        int TamPagina = 20,
+        string? CurrentUsuarioId = null)
         : IRequest<GetPersonasResult>;
 
     public record GetPersonasResult(List<PersonaDto> Items, int Total, int Pagina, int TamPagina);
@@ -27,7 +28,7 @@ namespace GestionElectoral.Application.Features.Personas.Queries.GetPersonas
             CancellationToken cancellationToken)
         {
             var (items, total) = await _repo.ListarAsync(
-                request.Busqueda, request.Pagina, request.TamPagina, cancellationToken);
+                request.Busqueda, request.Pagina, request.TamPagina, request.CurrentUsuarioId, cancellationToken);
 
             return new GetPersonasResult(items, total, request.Pagina, request.TamPagina);
         }

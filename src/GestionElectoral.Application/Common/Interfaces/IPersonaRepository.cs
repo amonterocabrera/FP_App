@@ -8,7 +8,7 @@ namespace GestionElectoral.Application.Common.Interfaces
         Task<bool> ExistePorCedulaAsync(string cedula, CancellationToken ct = default);
 
         Task<(List<PersonaDto> Items, int Total)> ListarAsync(
-            string? busqueda, int pagina, int tamPagina, CancellationToken ct = default);
+            string? busqueda, int pagina, int tamPagina, string? currentUsuarioId = null, CancellationToken ct = default);
 
         Task<PersonaDto?> ObtenerPorIdAsync(Guid id, CancellationToken ct = default);
 

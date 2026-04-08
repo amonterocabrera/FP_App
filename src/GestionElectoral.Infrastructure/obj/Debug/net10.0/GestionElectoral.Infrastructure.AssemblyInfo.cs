@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestionElectoral.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fbb44dd898b4f4ee64c91011122007d19d7e4f7c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bf52a91814222cf9e47b9674255b61b9eb3e9c9")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestionElectoral.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestionElectoral.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

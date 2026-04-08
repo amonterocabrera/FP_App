@@ -44,11 +44,11 @@ export const routes: Routes = [
           import('./mas-opciones/mas-opciones.page').then(m => m.MasOpcionesPage),
       },
 
-      // Tab 5 — Perfil (usa la misma página del dashboard pero abre el menú)
+      // Tab 5 — Perfil
       {
         path: 'perfil',
         loadComponent: () =>
-          import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+          import('./users/user-form/user-form.component').then(m => m.UserFormComponent),
       },
 
       // Rutas secundarias dentro del shell (sin tabs visualmente)

@@ -45,7 +45,13 @@
               <ion-label>Dashboard Central</ion-label>
             </ion-item>
           </ion-menu-toggle>
-
+          <ion-menu-toggle auto-hide="false">
+            <ion-item routerDirection="root" routerLink="/personas"
+                      routerLinkActive="selected" class="nav-item">
+              <ion-icon slot="start" name="people-outline"></ion-icon>
+              <ion-label>Gestión de Personas</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
           <!-- Dynamic modules -->
           <div class="menu-divider" *ngIf="modulos && modulos.length > 0">
             <span>MÓDULOS DEL SISTEMA</span>

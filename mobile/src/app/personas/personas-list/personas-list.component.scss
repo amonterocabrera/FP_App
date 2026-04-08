@@ -1,60 +1,235 @@
-.search-toolbar {
-  --background: #f4f7f6;
-  padding: 5px 10px;
-}
-
+// ── GENERAL LAYOUT ───────────────────────────────────────────────────────────
 .list-container {
   background: #f4f7f6;
   min-height: 100%;
-  padding-bottom: 20px;
+  padding: 0 16px;
+  padding-bottom: 80px;
 }
 
-ion-list {
+/* HEADER & SEARCH */
+.modern-header {
+  --background: linear-gradient(135deg, #0F3D2E, #16A34A);
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-search-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.modern-search.inline-search {
+  --background: #ffffff;
+  --border-radius: 20px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --placeholder-color: #94a3b8;
+  --icon-color: #16A34A;
+  --clear-button-color: #94a3b8;
+  padding: 0;
+  height: 48px;
+  margin: 0;
+  width: 100%;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease forwards;
+}
+
+.slide-down {
+  animation: slide-down 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* LIST & CARDS */
+.modern-list {
   background: transparent;
   padding: 0;
+  margin-top: 16px;
 }
 
-ion-item {
+.modern-sliding-item {
+  margin: 0 0 10px 0;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.modern-card-item {
   --background: #ffffff;
-  --padding-start: 15px;
-  --inner-padding-end: 15px;
-  margin-bottom: 2px;
+  --border-radius: 12px;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0;
+}
 
-  h2 {
-    font-weight: 600;
-    font-size: 16px;
-    color: #2c3e50;
-    margin-bottom: 4px;
-  }
+.modern-avatar-wrapper {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 2px;
+}
 
-  p {
-    font-size: 13px;
-    color: #7f8c8d;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 2px;
+.modern-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
 
-    strong {
-      color: #34495e;
-    }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
-.avatar-circle {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: #e8f5e9;
-  color: #00A651;
+.avatar-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
-  margin-right: 15px;
+  color: #64748b;
+  font-size: 1.1rem;
 }
 
+.modern-card-label {
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2px;
+  width: 100%;
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #1e293b;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 8px;
+  line-height: 1.2;
+}
+
+.modern-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.active-badge {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.inactive-badge {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.card-details-row {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: center;
+  margin-top: 1px;
+}
+
+.card-detail {
+  font-size: 0.8rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1px 0;
+  line-height: 1.2;
+
+  strong {
+    color: #475569;
+    font-weight: 600;
+  }
+  
+  ion-icon {
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+}
+
+/* FAB BUTTON */
+.floating-btn-container {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 10;
+}
+
+.modern-fab {
+  --background: linear-gradient(135deg, #16A34A, #22C55E);
+  --box-shadow: 0 8px 24px rgba(22, 163, 74, 0.4);
+  --color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.modern-fab:active {
+  transform: scale(0.95);
+}
+
+/* SWIPE BUTTONS */
+.btn-delete {
+  font-size: 1.5rem;
+}
+
+.btn-edit {
+  font-size: 1.5rem;
+}
+
+/* EMPTY STATE */
 .empty-state {
   display: flex;
   flex-direction: column;

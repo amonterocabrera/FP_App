@@ -63,6 +63,44 @@ namespace GestionElectoral.WebAPI.Controllers
             }
         }
 
+        // ── 1a. Buscar en Base de Datos Local ────────────────────────────────
+
+        /// <summary>
+        /// Busca un ciudadano en GestionElectoral por cédula.
+        /// Si ya está registrado, esto permite mostrar sus datos sin re-crearlo.
+        /// </summary>
+        [HttpGet("por-cedula/{cedula}")]
+        public async Task<IActionResult> GetByCedula(string cedula, CancellationToken ct)
+        {
+            var persona = await _db.Personas
+                .Include(p => p.Contactos)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Cedula == cedula && !p.IsDeleted, ct);
+
+            if (persona is null) return NotFound(new { error = "No registrado localmente." });
+
+            return Ok(new
+            {
+                persona.Id,
+                persona.Cedula,
+                persona.Nombre,
+                persona.Apellido,
+                // Usamos Genero.ToString() directo al Enum ('M' o 'F')
+                Genero = persona.Genero.ToString(),
+                persona.FechaNacimiento,
+                persona.Email,
+                persona.Direccion,
+                persona.IsActive,
+                Contactos = persona.Contactos.Where(c => !c.IsDeleted).Select(c => new
+                {
+                    c.Tipo,
+                    c.Valor,
+                    c.EsPrincipal,
+                    c.Nota
+                }).ToList()
+            });
+        }
+
         // ── 1b. DIAGNÓSTICO — ver formato real de cédulas en PadronJCE ────────────
         // Remover en producción
 
@@ -87,6 +125,7 @@ namespace GestionElectoral.WebAPI.Controllers
         /// La foto NUNCA se almacena en GestionElectoral.
         /// </summary>
         [HttpGet("{cedula}/foto")]
+        [AllowAnonymous]
         public async Task<IActionResult> ObtenerFoto(string cedula, CancellationToken ct)
         {
             var foto = await _padron.ObtenerFotoAsync(cedula, ct);
@@ -106,7 +145,19 @@ namespace GestionElectoral.WebAPI.Controllers
             CancellationToken ct = default)
         {
             var result = await _mediator.Send(
-                new GetPersonasQuery(busqueda, pagina, tamPagina), ct);
+                new GetPersonasQuery(busqueda, pagina, tamPagina, null), ct);
+            return Ok(result);
+        }
+
+        [HttpGet("mis-registros")]
+        public async Task<IActionResult> GetMisRegistros(
+            [FromQuery] string? busqueda,
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamPagina = 1000,
+            CancellationToken ct = default)
+        {
+            var result = await _mediator.Send(
+                new GetPersonasQuery(busqueda, pagina, tamPagina, UserId), ct);
             return Ok(result);
         }
 

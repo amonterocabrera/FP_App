@@ -6,8 +6,10 @@ import {
 import { addIcons } from 'ionicons';
 import {
   homeOutline, barChartOutline, personAddOutline,
-  gridOutline, personCircleOutline
+  gridOutline, personCircleOutline, peopleOutline
 } from 'ionicons/icons';
+
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-tabs',
@@ -20,10 +22,14 @@ import {
   ],
 })
 export class TabsPage {
-  constructor() {
+  constructor(public authSvc: AuthService) {
     addIcons({
       homeOutline, barChartOutline, personAddOutline,
-      gridOutline, personCircleOutline,
+      gridOutline, personCircleOutline, peopleOutline
     });
+  }
+
+  get userId(): string | undefined {
+    return this.authSvc.getCurrentUser()?.id;
   }
 }

@@ -1,22 +1,38 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Gestión de Personas</ion-title>
-    <ion-buttons slot="end">
-      <ion-button routerLink="/personas/new">
-        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-        Nueva
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-  <ion-toolbar class="search-toolbar">
-    <ion-searchbar 
-      placeholder="Buscar por cédula, nombre o correo..." 
-      [debounce]="500"
-      (ionInput)="onSearch($event)">
-    </ion-searchbar>
+  <ion-toolbar class="modern-header" [class.search-active]="showSearch">
+    <!-- Vista Normal (Sin Buscador) -->
+    <div *ngIf="!showSearch" class="header-content fade-in">
+      <div style="display:flex; align-items:center; gap: 8px;">
+        <ion-menu-button style="color: #ffffff;"></ion-menu-button>
+        <div style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
+          <h1 style="color:#ffffff; font-size:1.1rem; font-weight:800; margin:0; letter-spacing:0.02em;">Gestión de Personas</h1>
+          <span style="color:rgba(255,255,255,0.8); font-size:0.75rem; font-weight:500;">Registro electoral</span>
+        </div>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleSearch()" style="color: #ffffff;">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+
+    <!-- Vista de Búsqueda Activa -->
+    <div *ngIf="showSearch" class="header-search-content slide-down">
+      <ion-buttons slot="start">
+        <ion-button (click)="toggleSearch()" style="color: #ffffff;">
+          <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      
+      <ion-searchbar 
+        #searchBar
+        class="modern-search inline-search"
+        placeholder="Buscar personas..." 
+        [debounce]="500"
+        show-clear-button="always"
+        (ionInput)="onSearch($event)">
+      </ion-searchbar>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -32,26 +48,62 @@
       <p>Intenta con otra búsqueda o agrega una nueva persona.</p>
     </div>
 
-    <ion-list *ngIf="personas.length > 0" lines="full">
-      <ion-item-sliding *ngFor="let persona of personas">
-        <ion-item button [routerLink]="['/personas/edit', persona.id]">
-          <div class="avatar-circle" slot="start">
-            {{ (persona.nombreCompleto || persona.nombre)?.charAt(0) | uppercase }}
+    <!-- Skeleton Loaders -->
+    <ion-list *ngIf="isLoading && personas.length === 0" lines="full">
+      <ion-item *ngFor="let i of [1,2,3,4,5,6]">
+        <ion-avatar slot="start" style="width: 48px; height: 48px;">
+          <ion-skeleton-text animated style="border-radius: 50%; width: 100%; height: 100%;"></ion-skeleton-text>
+        </ion-avatar>
+        <ion-label>
+          <h2><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></h2>
+          <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+          <p><ion-skeleton-text animated style="width: 30%"></ion-skeleton-text></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="personas.length > 0" class="modern-list" lines="none">
+      <ion-item-sliding *ngFor="let persona of personas" class="modern-sliding-item">
+        <ion-item button [routerLink]="['/personas/edit', persona.id]" class="modern-card-item">
+          <!-- Real avatar UX Fix with ng-template fallback -->
+          <div slot="start" class="modern-avatar-wrapper">
+            <ion-avatar class="modern-avatar">
+              <img *ngIf="persona.cedula; else fallback" 
+                   [src]="getFotoUrl(persona.cedula)" 
+                   (error)="handleImageError($event)" />
+              
+              <ng-template #fallback>
+                <div class="avatar-fallback">
+                  {{ (persona.nombreCompleto || persona.nombre)?.charAt(0) | uppercase }}
+                </div>
+              </ng-template>
+              
+              <!-- Hidden by default, shown by handleImageError if img fails -->
+              <div class="avatar-fallback fallback-manual" style="display: none;">
+                {{ (persona.nombreCompleto || persona.nombre)?.charAt(0) | uppercase }}
+              </div>
+            </ion-avatar>
           </div>
-          <ion-label>
-            <h2>{{ persona.nombreCompleto || (persona.nombre + ' ' + persona.apellido) }}</h2>
-            <p><strong>Cédula:</strong> {{ persona.cedula }}</p>
-            <p *ngIf="persona.email"><ion-icon name="mail-outline"></ion-icon> {{ persona.email }}</p>
-            <p *ngIf="persona.contactos?.[0]"><ion-icon name="call-outline"></ion-icon> {{ persona.contactos![0].valor }}</p>
+
+          <ion-label class="modern-card-label">
+            <div class="card-header-row">
+              <h2 class="card-title">{{ persona.nombreCompleto || (persona.nombre + ' ' + persona.apellido) }}</h2>
+            </div>
+            
+            <p class="card-detail"><strong>Cédula:</strong> {{ persona.cedula }}</p>
+            <div class="card-details-row">
+              <p class="card-detail" *ngIf="persona.email"><ion-icon name="mail-outline"></ion-icon> {{ persona.email }}</p>
+              <p class="card-detail" *ngIf="persona.contactos?.[0]"><ion-icon name="call-outline"></ion-icon> {{ persona.contactos![0].valor }}</p>
+            </div>
           </ion-label>
-          <ion-badge [color]="persona.isActive ? 'success' : 'medium'" slot="end">
-            {{ persona.isActive ? 'Activo' : 'Inactivo' }}
-          </ion-badge>
         </ion-item>
 
         <ion-item-options side="end">
-          <ion-item-option color="danger" (click)="deletePersona(persona)">
+          <ion-item-option color="danger" class="btn-delete" (click)="deletePersona(persona)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="light" class="btn-edit" [routerLink]="['/personas/edit', persona.id]">
+            <ion-icon slot="icon-only" name="pencil-outline" style="color: #16A34A;"></ion-icon>
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
@@ -60,5 +112,13 @@
     <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="!hasNextPage">
       <ion-infinite-scroll-content loadingText="Cargando más registros..."></ion-infinite-scroll-content>
     </ion-infinite-scroll>
+
+    <!-- FAB BOTÓN -->
+    <ion-fab class="floating-btn-container">
+      <ion-fab-button class="modern-fab" routerLink="/personas/new">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
   </div>
 </ion-content>

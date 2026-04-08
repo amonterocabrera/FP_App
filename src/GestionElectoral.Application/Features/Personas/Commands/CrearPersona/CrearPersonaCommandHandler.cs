@@ -26,19 +26,22 @@ namespace GestionElectoral.Application.Features.Personas.Commands.CrearPersona
                     $"La cédula '{request.Cedula}' ya está registrada en el sistema.");
 
             // 2. Consultar datos del ciudadano en PadronJCE (SOLO LECTURA)
-            var ciudadano = await _padron.BuscarPorCedulaAsync(request.Cedula, cancellationToken)
-                ?? throw new KeyNotFoundException(
-                    $"La cédula '{request.Cedula}' no fue encontrada en el PadronJCE.");
+            var ciudadano = await _padron.BuscarPorCedulaAsync(request.Cedula, cancellationToken);
+            
+            if (ciudadano == null && (string.IsNullOrWhiteSpace(request.Nombre) || string.IsNullOrWhiteSpace(request.Apellido)))
+            {
+                 throw new KeyNotFoundException($"La cédula '{request.Cedula}' no fue encontrada en el PadronJCE y no se proporcionaron datos manuales.");
+            }
 
-            // 3. Construir la entidad Persona con datos del padrón
+            // 3. Construir la entidad Persona con datos del padrón o datos manuales
             var persona = new Persona
             {
                 Id              = Guid.NewGuid(),
-                Cedula          = ciudadano.Cedula,
-                Nombre          = ciudadano.Nombres,
-                Apellido        = $"{ciudadano.Apellido1} {ciudadano.Apellido2}".Trim(),
-                FechaNacimiento = ciudadano.FechaNacimiento,
-                Genero          = ciudadano.IdSexo == 2 ? Genero.F : Genero.M,
+                Cedula          = ciudadano?.Cedula ?? request.Cedula,
+                Nombre          = ciudadano?.Nombres ?? request.Nombre!.Trim(),
+                Apellido        = ciudadano != null ? $"{ciudadano.Apellido1} {ciudadano.Apellido2}".Trim() : request.Apellido!.Trim(),
+                FechaNacimiento = ciudadano?.FechaNacimiento ?? request.FechaNacimiento,
+                Genero          = ciudadano != null ? (ciudadano.IdSexo == "2" || ciudadano.IdSexo?.ToUpper() == "F" ? Genero.F : Genero.M) : request.Genero ?? Genero.M,
                 Email           = request.Email?.Trim(),
                 Direccion       = request.Direccion?.Trim(),
                 IsActive        = true,

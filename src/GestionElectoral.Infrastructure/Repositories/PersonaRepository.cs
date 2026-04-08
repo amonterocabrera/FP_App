@@ -22,12 +22,17 @@ namespace GestionElectoral.Infrastructure.Repositories
             => _db.Personas.AnyAsync(p => p.Cedula == cedula && !p.IsDeleted, ct);
 
         public async Task<(List<PersonaDto> Items, int Total)> ListarAsync(
-            string? busqueda, int pagina, int tamPagina, CancellationToken ct = default)
+            string? busqueda, int pagina, int tamPagina, string? currentUsuarioId = null, CancellationToken ct = default)
         {
             var query = _db.Personas
                 .Include(p => p.Contactos.Where(c => !c.IsDeleted))
                 .Where(p => !p.IsDeleted)
                 .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(currentUsuarioId))
+            {
+                query = query.Where(p => p.CreatedBy == currentUsuarioId);
+            }
 
             if (!string.IsNullOrWhiteSpace(busqueda))
             {

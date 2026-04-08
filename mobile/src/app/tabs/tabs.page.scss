@@ -1,0 +1,71 @@
+// ── Tab bar container ─────────────────────────────────────────────────────────
+
+.fp-tab-bar {
+  --background: #1a2332;
+  --border: none;
+  border-top: none;
+  height: 68px;
+  padding: 0 8px;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+}
+
+// ── Individual tab button ─────────────────────────────────────────────────────
+
+.fp-tab-btn {
+  --color: rgba(255, 255, 255, 0.4);
+  --color-selected: #00A651;
+  --ripple-color: rgba(0, 166, 81, 0.15);
+
+  ion-icon {
+    font-size: 22px;
+    transition: transform 0.2s ease;
+  }
+
+  ion-label {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.02em;
+    margin-top: 3px;
+  }
+
+  &.tab-selected {
+    ion-icon { transform: scale(1.1); }
+  }
+}
+
+// ── FAB center button ─────────────────────────────────────────────────────────
+
+.fp-tab-fab {
+  // Lift the FAB above the tab bar
+  position: relative;
+  top: -14px;
+  --color: rgba(255, 255, 255, 0.65);
+  --color-selected: #fff;
+
+  .fab-circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00A651 0%, #005c33 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 6px 20px rgba(0, 166, 81, 0.45),
+      0 2px 8px rgba(0, 0, 0, 0.25);
+    border: 3px solid #1a2332;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    ion-icon {
+      font-size: 24px;
+      color: #fff;
+    }
+  }
+
+  &:active .fab-circle {
+    transform: scale(0.91);
+    box-shadow: 0 3px 10px rgba(0, 166, 81, 0.3);
+  }
+}

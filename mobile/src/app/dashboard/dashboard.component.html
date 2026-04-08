@@ -1,24 +1,27 @@
-<ion-header class="ion-no-border">
+<ion-header class="ion-no-border mobile-header">
   <ion-toolbar class="custom-toolbar">
+
+    <!-- LEFT: menu button -->
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button class="menu-btn"></ion-menu-button>
     </ion-buttons>
+
+    <!-- CENTER: branding block -->
     <ion-title>
-      <div class="header-title">
-        <span class="title-main">Gestión Electoral</span>
+      <div class="header-brand">
+        <div class="brand-logo-wrapper">
+          <img src="assets/fp-logo.png" alt="FP" class="brand-logo" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Gestión Electoral</span>
+          <span class="brand-sub">FUERZA DEL PUEBLO · 2026</span>
+        </div>
       </div>
     </ion-title>
-    
-    <ion-buttons slot="end">
-      <div class="user-profile">
-        <ion-avatar>
-          <img src="https://i.pravatar.cc/150?img=11" alt="avatar" />
-        </ion-avatar>
-        <span class="user-name">A.M. <ion-icon name="chevron-down-outline"></ion-icon></span>
-      </div>
-    </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
+
 
 <ion-content class="dashboard-content">
   <!-- Top 4 KPI Cards -->
@@ -92,44 +95,26 @@
   <div class="dashboard-grid">
     <!-- Interactive Map Section -->
     <div class="dashboard-card map-card">
-      <div class="map-container">
-        <!-- SVG Placeholder for DR Map colored by density -->
-        <svg viewBox="0 0 800 500" class="dr-map">
-          <!-- Real map paths would go here, these are structural shapes to emulate the design -->
-          <!-- We use CSS variables to color them -->
-          <path d="M 300 200 Q 400 150 500 200 T 650 250 Q 700 350 550 400 T 350 400 Q 200 350 250 250 Z" class="region density-high" />
-          <path d="M 150 150 Q 250 100 300 200 Q 250 250 200 350 Q 100 250 150 150 Z" class="region density-med" />
-          <path d="M 500 200 Q 600 150 700 180 Q 650 250 500 200 Z" class="region density-low" />
-          
-          <!-- Labels and dynamic values -->
-          <text x="350" y="240" class="map-label">Santiago</text>
-          <text x="350" y="255" class="map-value">{{ getProvinceValue('Santiago') | number }}</text>
-          
-          <text x="450" y="310" class="map-label">Santo Domingo</text>
-          <text x="450" y="325" class="map-value">{{ getProvinceValue('Santo Domingo') | number }}</text>
-          
-          <text x="500" y="340" class="map-label sub">Distrito Nacional</text>
-          <text x="500" y="352" class="map-value sub">{{ getProvinceValue('Distrito Nacional') | number }}</text>
-          
-          <text x="250" y="210" class="map-label">La Vega</text>
-          <text x="250" y="225" class="map-value">{{ getProvinceValue('La Vega') | number }}</text>
-          
-          <text x="200" y="150" class="map-label">Puerto Plata</text>
-          <text x="200" y="165" class="map-value">{{ getProvinceValue('Puerto Plata') || 55200 | number }}</text>
-          
-          <text x="600" y="230" class="map-label">San Cristóbal</text>
-          <text x="600" y="245" class="map-value">{{ getProvinceValue('San Cristóbal') | number }}</text>
-        </svg>
-
-        <div class="map-legend">
-          <span class="legend-text">Registration</span>
-          <div class="legend-gradient"></div>
-          <div class="legend-labels">
-            <span>Low</span>
-            <span>High</span>
+      <div class="map-card-header">
+        <div class="map-card-title">
+          <ion-icon name="map-outline"></ion-icon>
+          <div>
+            <h2>Cobertura por Provincia</h2>
+            <p>Porcentaje de validados vs. meta del 80%</p>
           </div>
         </div>
+        <!-- Selected province quick info -->
+        <div class="map-selected-badge" *ngIf="selectedMapProvince">
+          <span class="badge-name">{{ selectedMapProvince.name }}</span>
+          <span class="badge-value">{{ selectedMapProvince.value }}%</span>
+        </div>
       </div>
+
+      <!-- ✅ Real interactive SVG map with semaphore coloring -->
+      <app-dominican-map
+        [provinces]="mapData"
+        (provinceClick)="onMapProvinceSelected($event)">
+      </app-dominican-map>
     </div>
 
     <!-- Top Recintos List -->

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestionElectoral.WebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8aebb470ed1ae3ed3af941076b1c60633e573d66")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fbb44dd898b4f4ee64c91011122007d19d7e4f7c")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestionElectoral.WebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestionElectoral.WebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

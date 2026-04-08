@@ -3,62 +3,95 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+// ── DTOs de respuesta (alineados con el backend refactorizado) ────────────────
+
 export interface Persona {
   id?: string;
   cedula: string;
   nombre: string;
   apellido: string;
-  fechaNacimiento: string;
+  nombreCompleto?: string;
+  fechaNacimiento?: string;
   genero: string;
-  telefono?: string;
   email?: string;
   direccion?: string;
+  fotoUrl?: string;
   isActive: boolean;
+  contactos?: ContactoDto[];
 }
 
-export interface PaginatedResult<T> {
-  data: T[];
-  totalRecords: number;
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
+export interface ContactoDto {
+  id?: number;
+  tipo: number;
+  tipoNombre?: string;
+  valor: string;
+  esPrincipal: boolean;
+  nota?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface PersonasResult {
+  items: Persona[];
+  total: number;
+  pagina: number;
+  tamPagina: number;
+}
+
+// ── Payloads de request ───────────────────────────────────────────────────────
+
+export interface CrearPersonaRequest {
+  cedula: string;
+  email?: string;
+  direccion?: string;
+  contactos?: ContactoInputDto[];
+}
+
+export interface ActualizarPersonaRequest {
+  email?: string;
+  direccion?: string;
+  contactos?: ContactoInputDto[];
+}
+
+export interface ContactoInputDto {
+  tipo: number;
+  valor: string;
+  esPrincipal: boolean;
+  nota?: string;
+}
+
+// ── Service ───────────────────────────────────────────────────────────────────
+
+@Injectable({ providedIn: 'root' })
 export class PersonasService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Personas`;
+  private http   = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/api/personas`;
 
-  getPersonas(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = '', includeDeleted: boolean = false): Observable<PaginatedResult<Persona>> {
+  getPersonas(
+    busqueda: string = '',
+    pagina: number   = 1,
+    tamPagina: number = 20
+  ): Observable<PersonasResult> {
     let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString())
-      .set('includeDeleted', includeDeleted.toString());
+      .set('pagina', pagina.toString())
+      .set('tamPagina', tamPagina.toString());
 
-    if (searchTerm) {
-      params = params.set('searchTerm', searchTerm);
-    }
+    if (busqueda) params = params.set('busqueda', busqueda);
 
-    return this.http.get<PaginatedResult<Persona>>(this.apiUrl, { params });
+    return this.http.get<PersonasResult>(this.apiUrl, { params });
   }
 
   getPersona(id: string): Observable<Persona> {
     return this.http.get<Persona>(`${this.apiUrl}/${id}`);
   }
 
-  createPersona(persona: Persona): Observable<Persona> {
-    return this.http.post<Persona>(this.apiUrl, persona);
+  createPersona(payload: CrearPersonaRequest): Observable<{ id: string; cedula: string; nombreCompleto: string }> {
+    return this.http.post<any>(this.apiUrl, payload);
   }
 
-  updatePersona(id: string, persona: Persona): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, persona);
+  updatePersona(id: string, payload: ActualizarPersonaRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, payload);
   }
 
-  deletePersona(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  deletePersona(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

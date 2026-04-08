@@ -859,24 +859,32 @@
     ]
   },
   "packageFolders": {
-    "/Users/aristidesmonterocabrera/.nuget/packages/": {}
+    "C:\\Users\\cabal\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj",
       "projectName": "GestionElectoral.Domain",
-      "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj",
-      "packagesPath": "/Users/aristidesmonterocabrera/.nuget/packages/",
-      "outputPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/obj/",
+      "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj",
+      "packagesPath": "C:\\Users\\cabal\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/Users/aristidesmonterocabrera/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\cabal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -922,7 +930,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

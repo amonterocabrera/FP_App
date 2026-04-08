@@ -36,13 +36,13 @@
       <ion-item-sliding *ngFor="let persona of personas">
         <ion-item button [routerLink]="['/personas/edit', persona.id]">
           <div class="avatar-circle" slot="start">
-            {{ persona.nombre.charAt(0) | uppercase }}{{ persona.apellido.charAt(0) | uppercase }}
+            {{ (persona.nombreCompleto || persona.nombre)?.charAt(0) | uppercase }}
           </div>
           <ion-label>
-            <h2>{{ persona.nombre }} {{ persona.apellido }}</h2>
+            <h2>{{ persona.nombreCompleto || (persona.nombre + ' ' + persona.apellido) }}</h2>
             <p><strong>Cédula:</strong> {{ persona.cedula }}</p>
             <p *ngIf="persona.email"><ion-icon name="mail-outline"></ion-icon> {{ persona.email }}</p>
-            <p *ngIf="persona.telefono"><ion-icon name="call-outline"></ion-icon> {{ persona.telefono }}</p>
+            <p *ngIf="persona.contactos?.[0]"><ion-icon name="call-outline"></ion-icon> {{ persona.contactos![0].valor }}</p>
           </ion-label>
           <ion-badge [color]="persona.isActive ? 'success' : 'medium'" slot="end">
             {{ persona.isActive ? 'Activo' : 'Inactivo' }}

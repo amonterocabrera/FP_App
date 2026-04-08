@@ -1,6 +1,7 @@
 using System.Text;
 using GestionElectoral.Domain.Entities.Identity;
 using GestionElectoral.Infrastructure.Persistence;
+using GestionElectoral.Application.Common.Interfaces;
 using GestionElectoral.Infrastructure.Persistence.Interceptors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +49,13 @@ namespace GestionElectoral.Infrastructure
 
             // 4. Custom Application Services
             services.AddScoped<GestionElectoral.Application.Common.Interfaces.IIdentityService, GestionElectoral.Infrastructure.Services.IdentityService>();
+
+            // 4b. PadronJCE — solo lectura, Dapper, conexión secundaria
+            services.AddTransient<IPadronJceService, GestionElectoral.Infrastructure.Services.PadronJceService>();
+
+            // 4c. Repositorios de dominio
+            services.AddScoped<GestionElectoral.Application.Common.Interfaces.IPersonaRepository,
+                               GestionElectoral.Infrastructure.Repositories.PersonaRepository>();
 
             // 5. Authentication (JWT)
             var jwtSecret = configuration["JwtSettings:Secret"] ?? "SuperSecretKeyForDevelopmentOnlyPleaseChangeLater__123456789";

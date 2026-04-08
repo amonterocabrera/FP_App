@@ -1,0 +1,84 @@
+<div class="map-wrapper">
+
+  <!-- ── Loading State ──────────────────────────────────────────────── -->
+  <div class="map-loading" *ngIf="isLoading">
+    <ion-spinner name="crescent" color="success"></ion-spinner>
+    <p>Cargando mapa...</p>
+  </div>
+
+  <!-- ── Error State ────────────────────────────────────────────────── -->
+  <div class="map-error" *ngIf="hasError && !isLoading">
+    <ion-icon name="map-outline"></ion-icon>
+    <p>No se pudo cargar el mapa.</p>
+  </div>
+
+  <!-- ── Map Container (SVG injected here) ─────────────────────────── -->
+  <div
+    class="map-svg-container"
+    #mapContainer
+    [class.map-ready]="!isLoading && !hasError"
+    [innerHTML]="svgMarkup"
+    *ngIf="!hasError">
+  </div>
+
+  <!-- ── Tooltip / Info Panel (appears on province tap) ────────────── -->
+  <div class="province-tooltip" *ngIf="tooltipVisible && tooltipProvince"
+       [class.visible]="tooltipVisible">
+    <div class="tooltip-header">
+      <div class="tooltip-title">
+        <div class="status-dot"
+             [style.background]="semaphoreColor(tooltipProvince.value, tooltipProvince.expected)">
+        </div>
+        <span>{{ tooltipProvince.name }}</span>
+      </div>
+      <button class="tooltip-close" (click)="closeTooltip()" aria-label="Cerrar">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="tooltip-body">
+      <div class="tooltip-stat">
+        <span class="tstat-label">Valor actual</span>
+        <span class="tstat-value" [style.color]="semaphoreColor(tooltipProvince.value, tooltipProvince.expected)">
+          {{ tooltipProvince.value | number }}
+        </span>
+      </div>
+      <div class="tooltip-stat">
+        <span class="tstat-label">Meta esperada</span>
+        <span class="tstat-value">{{ tooltipProvince.expected | number }}</span>
+      </div>
+      <div class="tooltip-stat">
+        <span class="tstat-label">Cumplimiento</span>
+        <span class="tstat-value"
+              [style.color]="semaphoreColor(tooltipProvince.value, tooltipProvince.expected)">
+          {{ getPercentage(tooltipProvince) }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Mini progress bar -->
+    <div class="tooltip-progress-track">
+      <div class="tooltip-progress-fill"
+           [style.width.%]="getPercentage(tooltipProvince) > 100 ? 100 : getPercentage(tooltipProvince)"
+           [style.background]="semaphoreColor(tooltipProvince.value, tooltipProvince.expected)">
+      </div>
+    </div>
+
+    <div class="tooltip-status-label"
+         [style.color]="semaphoreColor(tooltipProvince.value, tooltipProvince.expected)">
+      Estado: <strong>{{ semaphoreLabel(tooltipProvince.value, tooltipProvince.expected) | titlecase }}</strong>
+    </div>
+  </div>
+
+  <!-- ── Semaphore Legend ───────────────────────────────────────────── -->
+  <div class="map-legend" *ngIf="!isLoading && !hasError">
+    <div class="legend-item" *ngFor="let item of legend">
+      <span class="legend-dot" [style.background]="item.color"></span>
+      <div class="legend-text">
+        <span class="legend-label">{{ item.label }}</span>
+        <span class="legend-desc">{{ item.desc }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

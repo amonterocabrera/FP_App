@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { 
-  peopleOutline, 
-  checkmarkCircleOutline, 
-  timeOutline, 
-  mapOutline, 
-  maleFemaleOutline, 
+import {
+  peopleOutline,
+  checkmarkCircleOutline,
+  timeOutline,
+  mapOutline,
+  maleFemaleOutline,
   businessOutline,
   statsChartOutline,
   pieChartOutline,
@@ -17,8 +18,13 @@ import {
   alertCircle,
   checkmarkCircle,
   chevronDownOutline,
-  closeOutline
+  closeOutline,
 } from 'ionicons/icons';
+import {
+  DominicanMapComponent,
+  ProvinceMapData,
+  ProvinceClickEvent,
+} from '../shared/components/dominican-map';
 
 export interface ProvinceData {
   id: string;
@@ -42,7 +48,7 @@ interface ProgressBar {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, HttpClientModule, DominicanMapComponent],
 })
 export class DashboardComponent implements OnInit {
 
@@ -129,6 +135,35 @@ export class DashboardComponent implements OnInit {
 
   clearSelection(): void {
     this.selectedProvince = null;
+  }
+
+  // ── Semaphore map data (ProvinceMapData[]) ──────────────────────────────────
+  // Meta esperada = 80% del total de registrados de la provincia más grande
+  private readonly META_PORCENTAJE = 0.8; // 80% de cumplimiento esperado
+
+  /** Convierte los datos de provincia al formato que espera DominicanMapComponent */
+  get mapData(): ProvinceMapData[] {
+    const maxReg = this.maxRegistrados;
+    const expectedBase = Math.round(maxReg * this.META_PORCENTAJE);
+
+    return this.provinces.map(p => ({
+      id: p.id,
+      name: p.name,
+      // Valor: porcentaje de validados sobre el total registrado (0-100)
+      value: Math.round((p.validados / p.registrados) * 100),
+      // Esperado: 80%
+      expected: 80,
+    }));
+  }
+
+  /** Selección actual del mapa interactivo */
+  selectedMapProvince: ProvinceMapData | null = null;
+
+  onMapProvinceSelected(event: ProvinceClickEvent): void {
+    this.selectedMapProvince = event.province;
+    // También sincronizamos con el panel de detalle legacy si existe
+    const legacy = this.getProvinceById(event.svgId);
+    this.selectedProvince = legacy ?? null;
   }
 
   get recintosStats() {

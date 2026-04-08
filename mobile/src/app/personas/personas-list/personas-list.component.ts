@@ -54,14 +54,14 @@ export class PersonasListComponent implements OnInit {
   loadPersonas(event?: any) {
     if (!event) this.isLoading = true;
     
-    this.personasService.getPersonas(this.pageNumber, this.pageSize, this.searchTerm).subscribe({
+    this.personasService.getPersonas(this.searchTerm, this.pageNumber, this.pageSize).subscribe({
       next: (res) => {
         if (this.pageNumber === 1) {
-          this.personas = res.data;
+          this.personas = res.items;
         } else {
-          this.personas = [...this.personas, ...res.data];
+          this.personas = [...this.personas, ...res.items];
         }
-        this.hasNextPage = res.hasNextPage;
+        this.hasNextPage = (this.pageNumber * this.pageSize) < res.total;
         this.isLoading = false;
         if (event) event.target.complete();
       },

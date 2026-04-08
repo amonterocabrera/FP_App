@@ -1,33 +1,40 @@
 {
   "format": 1,
   "restore": {
-    "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Infrastructure/GestionElectoral.Infrastructure.csproj": {}
+    "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Infrastructure\\GestionElectoral.Infrastructure.csproj": {}
   },
   "projects": {
-    "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/GestionElectoral.Application.csproj": {
+    "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\GestionElectoral.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/GestionElectoral.Application.csproj",
+        "projectUniqueName": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\GestionElectoral.Application.csproj",
         "projectName": "GestionElectoral.Application",
-        "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/GestionElectoral.Application.csproj",
-        "packagesPath": "/Users/aristidesmonterocabrera/.nuget/packages/",
-        "outputPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/obj/",
+        "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\GestionElectoral.Application.csproj",
+        "packagesPath": "C:\\Users\\cabal\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/aristidesmonterocabrera/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\cabal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj": {
-                "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj"
+              "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj": {
+                "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj"
               }
             }
           }
@@ -81,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -359,22 +366,29 @@
         }
       }
     },
-    "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj": {
+    "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj",
         "projectName": "GestionElectoral.Domain",
-        "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj",
-        "packagesPath": "/Users/aristidesmonterocabrera/.nuget/packages/",
-        "outputPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/obj/",
+        "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj",
+        "packagesPath": "C:\\Users\\cabal\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/aristidesmonterocabrera/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\cabal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -420,7 +434,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -698,33 +712,40 @@
         }
       }
     },
-    "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Infrastructure/GestionElectoral.Infrastructure.csproj": {
+    "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Infrastructure\\GestionElectoral.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Infrastructure/GestionElectoral.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Infrastructure\\GestionElectoral.Infrastructure.csproj",
         "projectName": "GestionElectoral.Infrastructure",
-        "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Infrastructure/GestionElectoral.Infrastructure.csproj",
-        "packagesPath": "/Users/aristidesmonterocabrera/.nuget/packages/",
-        "outputPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Infrastructure/obj/",
+        "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Infrastructure\\GestionElectoral.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\cabal\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/aristidesmonterocabrera/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\cabal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/GestionElectoral.Application.csproj": {
-                "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Application/GestionElectoral.Application.csproj"
+              "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\GestionElectoral.Application.csproj": {
+                "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Application\\GestionElectoral.Application.csproj"
               },
-              "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj": {
-                "projectPath": "/Users/aristidesmonterocabrera/Documents/GitHub/FP_App/src/GestionElectoral.Domain/GestionElectoral.Domain.csproj"
+              "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj": {
+                "projectPath": "C:\\Users\\cabal\\source\\repos\\FP_App\\src\\GestionElectoral.Domain\\GestionElectoral.Domain.csproj"
               }
             }
           }
@@ -745,6 +766,10 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.35, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[10.0.5, )"
@@ -752,6 +777,10 @@
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[10.0.5, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[6.1.1, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -784,7 +813,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

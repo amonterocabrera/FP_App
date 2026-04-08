@@ -1,10 +1,13 @@
-using System;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using GestionElectoral.Application.Common.Interfaces;
+using GestionElectoral.Application.Features.Personas.Commands.CrearPersona;
+using GestionElectoral.Application.Features.Personas.Queries.BuscarEnPadron;
+using GestionElectoral.Application.Features.Personas.Queries.GetPersonaById;
+using GestionElectoral.Application.Features.Personas.Queries.GetPersonas;
 using GestionElectoral.Domain.Entities.Core;
 using GestionElectoral.Domain.Enums;
 using GestionElectoral.Infrastructure.Persistence;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,129 +19,205 @@ namespace GestionElectoral.WebAPI.Controllers
     [Authorize]
     public class PersonasController : ControllerBase
     {
+        private readonly ISender _mediator;
+        private readonly IPadronJceService _padron;
         private readonly ApplicationDbContext _db;
-        private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
 
-        public PersonasController(ApplicationDbContext db) => _db = db;
+        private string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-        // GET /api/personas
+        public PersonasController(
+            ISender mediator,
+            IPadronJceService padron,
+            ApplicationDbContext db)
+        {
+            _mediator = mediator;
+            _padron   = padron;
+            _db       = db;
+        }
+
+        // ── 1. Buscar en PadronJCE (solo lectura) ────────────────────────────────
+
+        /// <summary>
+        /// Busca un ciudadano en el PadronJCE por cédula.
+        /// Solo consulta — no crea ni modifica nada en GestionElectoral.
+        /// Usado para prellenar el formulario de registro.
+        /// </summary>
+        [HttpGet("buscar-padron/{cedula}")]
+        public async Task<IActionResult> BuscarEnPadron(string cedula, CancellationToken ct)
+        {
+            try
+            {
+                var result = await _mediator.Send(new BuscarEnPadronQuery(cedula), ct);
+                return result is null
+                    ? NotFound(new { error = $"Cédula '{cedula}' no encontrada en el PadronJCE." })
+                    : Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Expone el error de conexión/BD en desarrollo para facilitar diagnóstico
+                return StatusCode(500, new
+                {
+                    error = "Error al consultar el PadronJCE.",
+                    detalle = ex.Message   // quitar en producción
+                });
+            }
+        }
+
+        // ── 1b. DIAGNÓSTICO — ver formato real de cédulas en PadronJCE ────────────
+        // Remover en producción
+
+        [HttpGet("diagnostico/{cedula}")]
+        public async Task<IActionResult> Diagnostico(string cedula, CancellationToken ct)
+        {
+            try
+            {
+                var result = await _padron.DiagnosticarAsync(cedula, ct);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, innerError = ex.InnerException?.Message });
+            }
+        }
+
+        // ── 2. Foto dinámica desde PadronJCE ─────────────────────────────────────
+
+        /// <summary>
+        /// Retorna la fotografía del ciudadano consultada en tiempo real desde PadronJCE.
+        /// La foto NUNCA se almacena en GestionElectoral.
+        /// </summary>
+        [HttpGet("{cedula}/foto")]
+        public async Task<IActionResult> ObtenerFoto(string cedula, CancellationToken ct)
+        {
+            var foto = await _padron.ObtenerFotoAsync(cedula, ct);
+            if (foto is null || foto.Length == 0)
+                return NotFound(new { error = $"No hay foto registrada para la cédula '{cedula}'." });
+
+            return File(foto, "image/jpeg");
+        }
+
+        // ── 3. Listar personas registradas (paginado) ────────────────────────────
+
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? busqueda,
+            [FromQuery] int pagina = 1,
+            [FromQuery] int tamPagina = 20,
+            CancellationToken ct = default)
         {
-            var query = _db.Personas.AsNoTracking().Where(p => !p.IsDeleted).AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(p => p.Cedula.Contains(search) || 
-                                         p.Nombre.Contains(search) || 
-                                         p.Apellido.Contains(search));
-            }
-
-            var totalCount = await query.CountAsync();
-            var items = await query.OrderBy(p => p.Apellido).ThenBy(p => p.Nombre)
-                                   .Skip((page - 1) * pageSize).Take(pageSize)
-                                   .ToListAsync();
-
-            return Ok(new { items, totalCount, page, pageSize });
+            var result = await _mediator.Send(
+                new GetPersonasQuery(busqueda, pagina, tamPagina), ct);
+            return Ok(result);
         }
 
-        // GET /api/personas/{id}
+        // ── 4. Obtener persona por ID ─────────────────────────────────────────────
+
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
         {
-            var p = await _db.Personas.Include(x => x.Contactos).FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-            return p is null ? NotFound() : Ok(p);
+            var result = await _mediator.Send(new GetPersonaByIdQuery(id), ct);
+            return result is null ? NotFound() : Ok(result);
         }
 
-        // POST /api/personas
+        // ── 5. Crear persona (lee del PadronJCE, escribe en GestionElectoral) ────
+
+        /// <summary>
+        /// Registra una nueva persona. Obtiene los datos base del PadronJCE
+        /// usando la cédula y los persiste en GestionElectoral junto con
+        /// los datos de contacto proporcionados por el operador.
+        /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PersonaRequest req)
+        public async Task<IActionResult> Crear(
+            [FromBody] CrearPersonaCommand command,
+            CancellationToken ct)
         {
-            if (await _db.Personas.AnyAsync(p => p.Cedula == req.Cedula && !p.IsDeleted))
-                return Conflict(new { error = "Ya existe una persona activa con esta cédula." });
-
-            var persona = new Persona
+            try
             {
-                Id = Guid.NewGuid(),
-                Cedula = req.Cedula,
-                Nombre = req.Nombre,
-                Apellido = req.Apellido,
-                FechaNacimiento = req.FechaNacimiento,
-                Genero = req.Genero,
-                Email = req.Email,
-                Direccion = req.Direccion,
-                CreatedBy = UserId,
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-
-            if (req.Contactos != null && req.Contactos.Any())
+                var result = await _mediator.Send(command, ct);
+                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            }
+            catch (KeyNotFoundException ex)
             {
-                foreach(var c in req.Contactos)
-                {
-                    persona.Contactos.Add(new PersonaContacto 
-                    {
-                        Valor = c.Valor, 
-                        Tipo = c.Tipo,
-                        EsPrincipal = c.EsPrincipal,
-                        Nota = c.Nota,
-                        CreatedBy = UserId,
-                        CreatedAt = DateTimeOffset.UtcNow
-                    });
-                }
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+        }
+
+        // ── 6. Actualizar datos editables de la persona ───────────────────────────
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] ActualizarPersonaRequest req)
+        {
+            var persona = await _db.Personas
+                .Include(p => p.Contactos)
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+
+            if (persona is null) return NotFound();
+
+            // Solo actualizamos los campos que el operador puede modificar
+            // (nombre/apellido vienen del PadronJCE y no se tocan aquí)
+            persona.Email     = req.Email?.Trim();
+            persona.Direccion = req.Direccion?.Trim();
+            persona.UpdatedBy = UserId;
+            persona.UpdatedAt = DateTimeOffset.UtcNow;
+
+            // Reemplazar contactos (soft-delete + nuevos)
+            foreach (var c in persona.Contactos.Where(c => !c.IsDeleted))
+            {
+                c.IsDeleted = true;
+                c.UpdatedAt = DateTimeOffset.UtcNow;
+                c.UpdatedBy = UserId;
             }
 
-            _db.Personas.Add(persona);
-            await _db.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetById), new { id = persona.Id }, new { persona.Id });
-        }
-
-        // PUT /api/personas/{id}
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] PersonaRequest req)
-        {
-            var p = await _db.Personas.Include(x => x.Contactos).FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-            if (p is null) return NotFound();
-
-            p.Cedula = req.Cedula; p.Nombre = req.Nombre; p.Apellido = req.Apellido;
-            p.FechaNacimiento = req.FechaNacimiento; p.Genero = req.Genero; 
-            p.Email = req.Email; p.Direccion = req.Direccion;
-            p.UpdatedBy = UserId; p.UpdatedAt = DateTimeOffset.UtcNow;
-
-            _db.PersonaContactos.RemoveRange(p.Contactos);
-            
-            if (req.Contactos != null && req.Contactos.Any())
+            foreach (var c in req.Contactos ?? [])
             {
-                foreach(var c in req.Contactos)
+                persona.Contactos.Add(new PersonaContacto
                 {
-                    p.Contactos.Add(new PersonaContacto 
-                    {
-                        Valor = c.Valor, 
-                        Tipo = c.Tipo,
-                        EsPrincipal = c.EsPrincipal,
-                        Nota = c.Nota,
-                        CreatedBy = UserId,
-                        CreatedAt = DateTimeOffset.UtcNow
-                    });
-                }
+                    PersonaId   = persona.Id,
+                    Tipo        = c.Tipo,
+                    Valor       = c.Valor.Trim(),
+                    EsPrincipal = c.EsPrincipal,
+                    Nota        = c.Nota?.Trim(),
+                    CreatedBy   = UserId,
+                    IsActive    = true,
+                    IsDeleted   = false,
+                });
             }
 
             await _db.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE /api/personas/{id}
+        // ── 7. Eliminar (soft-delete) ─────────────────────────────────────────────
+
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var p = await _db.Personas.FindAsync(id);
-            if (p is null) return NotFound();
-            p.IsDeleted = true;
-            p.UpdatedBy = UserId; p.UpdatedAt = DateTimeOffset.UtcNow;
+            var persona = await _db.Personas.FindAsync(id);
+            if (persona is null) return NotFound();
+
+            persona.IsDeleted = true;
+            persona.UpdatedBy = UserId;
+            persona.UpdatedAt = DateTimeOffset.UtcNow;
+
             await _db.SaveChangesAsync();
             return NoContent();
         }
     }
 
-    public record PersonaContactoRequest(string Valor, TipoContacto Tipo, bool EsPrincipal, string? Nota);
-    public record PersonaRequest(string Cedula, string Nombre, string Apellido, DateTime? FechaNacimiento, Genero Genero, string? Email, string? Direccion, PersonaContactoRequest[]? Contactos);
+    // ── Request models para los endpoints no-CQRS ─────────────────────────────
+
+    public record ContactoRequest(
+        TipoContacto Tipo,
+        string Valor,
+        bool EsPrincipal,
+        string? Nota);
+
+    public record ActualizarPersonaRequest(
+        string? Email,
+        string? Direccion,
+        List<ContactoRequest>? Contactos);
 }

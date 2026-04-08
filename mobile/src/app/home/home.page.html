@@ -1,0 +1,46 @@
+<ion-content [fullscreen]="true" [scrollY]="false">
+
+  <div class="header-section">
+    <div class="fp-brand-container">
+      <img src="assets/logo_fp_full_color.png" alt="Fuerza del Pueblo" class="fp-logo-main" />
+    </div>
+  </div>
+
+  <div class="content-body">
+    <div class="welcome-text">
+      <h2 class="greeting">¡Bienvenido!</h2>
+      <p class="subtitle">Plataforma Electoral</p>
+    </div>
+
+    <div class="form-container">
+      <div class="input-group">
+        <div class="icon-wrapper">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <input type="email" class="fp-input" placeholder="Correo electrónico" [(ngModel)]="loginData.email" />
+      </div>
+
+      <div class="input-group">
+        <div class="icon-wrapper">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+        </div>
+        <input [type]="showPassword ? 'text' : 'password'" class="fp-input" placeholder="Contraseña"
+          [(ngModel)]="loginData.password" />
+        <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="icon-right"
+          (click)="togglePassword()"></ion-icon>
+      </div>
+
+      <button class="fp-button" (click)="login()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Iniciar Sesión</span>
+        <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+      </button>
+
+      <p class="forgot" (click)="forgotPassword()">¿Olvidaste tu contraseña?</p>
+    </div>
+
+    <div class="message-container" *ngIf="toastMessage" [class.error]="isError">
+      {{ toastMessage }}
+    </div>
+  </div>
+
+</ion-content>

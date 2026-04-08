@@ -11,7 +11,12 @@ import {
   businessOutline,
   statsChartOutline,
   pieChartOutline,
-  barChartOutline
+  barChartOutline,
+  trendingUpOutline,
+  location,
+  alertCircle,
+  checkmarkCircle,
+  chevronDownOutline
 } from 'ionicons/icons';
 
 interface StatCard {
@@ -41,9 +46,10 @@ interface ProgressBar {
 export class DashboardComponent implements OnInit {
 
   // Overall Stats
-  totalRegistrados = 1250430;
-  totalValidados = 850210;
-  totalPendientes = 400220;
+  totalRegistrados = 248735;
+  totalValidados = 214560;
+  totalPendientes = 34175;
+  totalRecintos = 1492;
 
   // Mock Data
   genderStats = {
@@ -77,7 +83,8 @@ export class DashboardComponent implements OnInit {
   constructor() {
     addIcons({ 
       peopleOutline, checkmarkCircleOutline, timeOutline, mapOutline, 
-      maleFemaleOutline, businessOutline, statsChartOutline, pieChartOutline, barChartOutline 
+      maleFemaleOutline, businessOutline, statsChartOutline, pieChartOutline, barChartOutline,
+      trendingUpOutline, location, alertCircle, checkmarkCircle, chevronDownOutline
     });
   }
 
@@ -95,4 +102,8 @@ export class DashboardComponent implements OnInit {
     return Math.round((this.genderStats.female / this.totalRegistrados) * 100);
   }
 
+  getProvinceValue(name: string): number {
+    const prov = this.provinceStats.find(p => p.label === name);
+    return prov ? prov.value : 0;
+  }
 }

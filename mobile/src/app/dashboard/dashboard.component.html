@@ -5,141 +5,146 @@
     </ion-buttons>
     <ion-title>
       <div class="header-title">
-        <span class="title-main">Dashboard</span>
-        <span class="title-sub">Resumen General</span>
+        <span class="title-main">Gestión Electoral</span>
       </div>
     </ion-title>
+    
+    <ion-buttons slot="end">
+      <div class="user-profile">
+        <ion-avatar>
+          <img src="https://i.pravatar.cc/150?img=11" alt="avatar" />
+        </ion-avatar>
+        <span class="user-name">A.M. <ion-icon name="chevron-down-outline"></ion-icon></span>
+      </div>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="dashboard-content">
-  <!-- General Stats Overview -->
-  <div class="stats-overview">
-    <div class="stat-card primary">
-      <div class="stat-icon-wrapper">
-        <ion-icon name="people-outline"></ion-icon>
+  <!-- Top 4 KPI Cards -->
+  <div class="kpi-row">
+    <!-- Total Registrados -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="titles">
+          <h3>Total Registrados</h3>
+          <p class="stat-number emerald">{{ totalRegistrados | number }}</p>
+        </div>
+        <div class="stat-icon-wrapper emerald">
+          <ion-icon name="bar-chart-outline"></ion-icon>
+        </div>
       </div>
-      <div class="stat-info">
-        <h3>Total Registrados</h3>
-        <p class="stat-number">{{ totalRegistrados | number }}</p>
+      <div class="stat-trend green">
+        <ion-icon name="trending-up-outline"></ion-icon>
+        <span>+12% esta semana</span>
       </div>
     </div>
 
-    <div class="stat-card-row">
-      <div class="stat-card success">
-        <div class="stat-icon-wrapper">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <!-- Validados -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="titles">
+          <h3>Validadas</h3>
+          <p class="stat-number blue">{{ totalValidados | number }}</p>
         </div>
-        <div class="stat-info">
-          <h3>Validados</h3>
-          <p class="stat-number">{{ totalValidados | number }}</p>
-          <div class="progress-bar-minimal">
-            <div class="progress-fill" [style.width.%]="validationPercentage"></div>
-          </div>
-          <p class="stat-percent">{{ validationPercentage }}% del total</p>
+        <div class="stat-icon-wrapper blue">
+          <ion-icon name="checkmark-circle"></ion-icon>
         </div>
       </div>
+      <div class="stat-trend blue">
+        <div class="trend-line"></div>
+      </div>
+    </div>
 
-      <div class="stat-card warning">
-        <div class="stat-icon-wrapper">
-          <ion-icon name="time-outline"></ion-icon>
-        </div>
-        <div class="stat-info">
+    <!-- Pendientes -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="titles">
           <h3>Pendientes</h3>
-          <p class="stat-number">{{ totalPendientes | number }}</p>
-          <div class="progress-bar-minimal">
-            <div class="progress-fill" [style.width.%]="100 - validationPercentage"></div>
-          </div>
-          <p class="stat-percent">{{ 100 - validationPercentage }}% por validar</p>
+          <p class="stat-number amber">{{ totalPendientes | number }}</p>
         </div>
+        <div class="stat-icon-wrapper amber">
+          <ion-icon name="alert-circle"></ion-icon>
+        </div>
+      </div>
+      <div class="stat-trend amber">
+        <div class="trend-line"></div>
+      </div>
+    </div>
+
+    <!-- Recintos -->
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="titles">
+          <h3>Recintos</h3>
+          <p class="stat-number dark-grey">{{ totalRecintos | number }}</p>
+        </div>
+        <div class="stat-icon-wrapper dark-grey">
+          <ion-icon name="location"></ion-icon>
+        </div>
+      </div>
+      <div class="stat-trend dark-grey">
+        <div class="trend-line"></div>
       </div>
     </div>
   </div>
 
   <div class="dashboard-grid">
-    <!-- Demographics: Gender & Age -->
-    <div class="dashboard-card demographic-card">
-      <div class="card-header">
-        <ion-icon name="male-female-outline"></ion-icon>
-        <h2>Demografía</h2>
-      </div>
-      
-      <div class="gender-section">
-        <div class="gender-bars">
-          <div class="gender-bar male">
-            <span class="gender-label">Hombres</span>
-            <div class="bar-track">
-              <div class="bar-fill" [style.width.%]="malePercentage"></div>
-            </div>
-            <span class="gender-value">{{ malePercentage }}%</span>
-          </div>
-          <div class="gender-bar female">
-            <span class="gender-label">Mujeres</span>
-            <div class="bar-track">
-              <div class="bar-fill" [style.width.%]="femalePercentage"></div>
-            </div>
-            <span class="gender-value">{{ femalePercentage }}%</span>
-          </div>
-        </div>
-      </div>
+    <!-- Interactive Map Section -->
+    <div class="dashboard-card map-card">
+      <div class="map-container">
+        <!-- SVG Placeholder for DR Map colored by density -->
+        <svg viewBox="0 0 800 500" class="dr-map">
+          <!-- Real map paths would go here, these are structural shapes to emulate the design -->
+          <!-- We use CSS variables to color them -->
+          <path d="M 300 200 Q 400 150 500 200 T 650 250 Q 700 350 550 400 T 350 400 Q 200 350 250 250 Z" class="region density-high" />
+          <path d="M 150 150 Q 250 100 300 200 Q 250 250 200 350 Q 100 250 150 150 Z" class="region density-med" />
+          <path d="M 500 200 Q 600 150 700 180 Q 650 250 500 200 Z" class="region density-low" />
+          
+          <!-- Labels and dynamic values -->
+          <text x="350" y="240" class="map-label">Santiago</text>
+          <text x="350" y="255" class="map-value">{{ getProvinceValue('Santiago') | number }}</text>
+          
+          <text x="450" y="310" class="map-label">Santo Domingo</text>
+          <text x="450" y="325" class="map-value">{{ getProvinceValue('Santo Domingo') | number }}</text>
+          
+          <text x="500" y="340" class="map-label sub">Distrito Nacional</text>
+          <text x="500" y="352" class="map-value sub">{{ getProvinceValue('Distrito Nacional') | number }}</text>
+          
+          <text x="250" y="210" class="map-label">La Vega</text>
+          <text x="250" y="225" class="map-value">{{ getProvinceValue('La Vega') | number }}</text>
+          
+          <text x="200" y="150" class="map-label">Puerto Plata</text>
+          <text x="200" y="165" class="map-value">{{ getProvinceValue('Puerto Plata') || 55200 | number }}</text>
+          
+          <text x="600" y="230" class="map-label">San Cristóbal</text>
+          <text x="600" y="245" class="map-value">{{ getProvinceValue('San Cristóbal') | number }}</text>
+        </svg>
 
-      <div class="divider"></div>
-      
-      <div class="age-section">
-        <h3>Por Rango de Edad</h3>
-        <div class="bar-chart">
-          <div class="bar-item" *ngFor="let age of ageRanges">
-            <div class="bar-header">
-              <span class="bar-label">{{ age.label }}</span>
-              <span class="bar-value">{{ age.value | number }}</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill" [style.width.%]="age.percentage" [style.background-color]="age.color"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Geographic: Provinces -->
-    <div class="dashboard-card province-card">
-      <div class="card-header">
-        <ion-icon name="map-outline"></ion-icon>
-        <h2>Top 5 Provincias</h2>
-      </div>
-      <div class="bar-chart">
-        <div class="bar-item" *ngFor="let prov of provinceStats">
-          <div class="bar-header">
-            <span class="bar-label">{{ prov.label }}</span>
-            <span class="bar-value">{{ prov.value | number }}</span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" [style.width.%]="prov.percentage" [style.background-color]="prov.color"></div>
+        <div class="map-legend">
+          <span class="legend-text">Registration</span>
+          <div class="legend-gradient"></div>
+          <div class="legend-labels">
+            <span>Low</span>
+            <span>High</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Recintos / Polling Stations -->
+    <!-- Top Recintos List -->
     <div class="dashboard-card recintos-card">
       <div class="card-header">
-        <ion-icon name="business-outline"></ion-icon>
-        <h2>Recintos Destacados</h2>
+        <h2>Top Recintos Electorales</h2>
       </div>
       <div class="list-container">
-        <div class="list-item" *ngFor="let recinto of recintosStats">
-          <div class="item-icon">
-            <ion-icon name="business-outline"></ion-icon>
-          </div>
+        <div class="list-item" *ngFor="let recinto of recintosStats; let i = index">
           <div class="item-content">
-            <h4>{{ recinto.name }}</h4>
-            <p>{{ recinto.province }}</p>
+            <h4>{{ i + 1 }}. {{ recinto.name }}</h4>
+            <span class="progress-text">{{ recinto.progress }}%</span>
           </div>
-          <div class="item-stats">
-            <span class="user-count">{{ recinto.users | number }} usuarios</span>
-            <div class="progress-circle" [class.high]="recinto.progress >= 80" [class.medium]="recinto.progress < 80">
-              {{ recinto.progress }}%
-            </div>
+          <div class="progress-bar-minimal">
+            <div class="progress-fill" [style.width.%]="recinto.progress" [class.success]="recinto.progress > 80"></div>
           </div>
         </div>
       </div>

@@ -42,8 +42,17 @@ export class AppComponent {
     return this.authService.isAuthenticated();
   }
 
+  private _cachedUser: any = null;
+  private _lastCheck: number = 0;
+
   get currentUser() {
-    return this.authService.getCurrentUser();
+    // Only fetch from localStorage at most once per 2 seconds to avoid JSON.parse infinite loops in getters
+    const now = Date.now();
+    if (!this._cachedUser || (now - this._lastCheck > 2000)) {
+      this._cachedUser = this.authService.getCurrentUser();
+      this._lastCheck = now;
+    }
+    return this._cachedUser;
   }
 
   get modulos() {
@@ -54,8 +63,13 @@ export class AppComponent {
     return 'cube-outline';
   }
 
+  get isHomePage(): boolean {
+    return this.router.url === '/home' || this.router.url === '/';
+  }
+
   async logout() {
     this.authService.logout();
+    this._cachedUser = null;
     await this.menuCtrl.close();
     this.router.navigate(['/home']);
   }

@@ -1,9 +1,9 @@
 <ion-app>
   <!-- El split-pane se activa en pantallas grandes (lg), pero si when es string, se aplica esa media-query. 
        Para deshabilitar condicionalmente, 'false' apaga el split-pane. -->
-  <ion-split-pane contentId="main-content" [when]="isLoggedIn ? 'lg' : false">
+  <ion-split-pane contentId="main-content" [when]="(isLoggedIn && !isHomePage) ? 'lg' : false">
     
-    <ion-menu contentId="main-content" type="overlay" class="institutional-menu" [disabled]="!isLoggedIn" menuId="main-menu">
+    <ion-menu contentId="main-content" type="overlay" class="institutional-menu" [disabled]="!isLoggedIn || isHomePage" menuId="main-menu">
       
       <ion-header class="ion-no-border">
         <ion-toolbar class="menu-header-toolbar">

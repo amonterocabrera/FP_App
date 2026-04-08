@@ -38,6 +38,12 @@ export class HomePage {
     addIcons({ personOutline, lockClosedOutline, eyeOutline, eyeOffOutline, arrowForwardOutline, lockClosed, locationOutline, peopleOutline, calendarOutline });
   }
 
+  ionViewWillEnter() {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
+    }
+  }
+
   togglePassword() {
     this.showPassword = !this.showPassword;
   }

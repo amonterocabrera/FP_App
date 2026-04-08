@@ -36,8 +36,10 @@ using (var scope = app.Services.CreateScope())
     {
         var userManager = services.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<GestionElectoral.Domain.Entities.Identity.ApplicationUser>>();
         var roleManager = services.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<GestionElectoral.Domain.Entities.Identity.ApplicationRole>>();
+        var dbContext = services.GetRequiredService<GestionElectoral.Infrastructure.Persistence.ApplicationDbContext>();
         
         await GestionElectoral.Infrastructure.Persistence.ApplicationDbContextSeed.SeedDefaultUserAsync(userManager, roleManager);
+        await GestionElectoral.Infrastructure.Persistence.ApplicationDbContextSeed.SeedModulosYPermisosAsync(dbContext, roleManager);
     }
     catch (System.Exception ex)
     {

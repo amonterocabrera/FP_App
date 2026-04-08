@@ -1,0 +1,97 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" style="--background: #0A2612; color: white;">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/users"></ion-back-button>
+    </ion-buttons>
+    <ion-title style="font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">
+      {{ isEditing ? 'EDITAR USUARIO' : 'NUEVO USUARIO' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content style="--background: #F7FAF8;">
+  
+  <div *ngIf="isLoading" style="display: flex; justify-content: center; margin-top: 50px;">
+    <ion-spinner color="success"></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading" style="padding: 20px;">
+    
+    <!-- Mimic the clean card style of the login -->
+    <div style="background: white; border-radius: 20px; padding: 25px 20px; box-shadow: 0 10px 30px rgba(0,40,20,0.05);">
+      
+      <form [formGroup]="userForm" (ngSubmit)="save()">
+        
+        <div class="custom-input-group">
+          <label>Nombres</label>
+          <div class="input-field-form">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" formControlName="nombre" placeholder="Ej. Juan">
+          </div>
+          <span class="error-msg" *ngIf="userForm.get('nombre')?.invalid && userForm.get('nombre')?.touched">
+            El nombre es requerido
+          </span>
+        </div>
+
+        <div class="custom-input-group">
+          <label>Apellidos</label>
+          <div class="input-field-form">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" formControlName="apellido" placeholder="Ej. Pérez">
+          </div>
+          <span class="error-msg" *ngIf="userForm.get('apellido')?.invalid && userForm.get('apellido')?.touched">
+            El apellido es requerido
+          </span>
+        </div>
+
+        <div class="custom-input-group">
+          <label>Correo Electrónico</label>
+          <div class="input-field-form">
+            <ion-icon name="mail-outline"></ion-icon>
+            <input type="email" formControlName="email" placeholder="correo@ejemplo.com" [readonly]="isEditing">
+          </div>
+          <span class="error-msg" *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+            Ingresa un correo válido
+          </span>
+        </div>
+
+        <div class="custom-input-group" *ngIf="!isEditing">
+          <label>Contraseña</label>
+          <div class="input-field-form">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" formControlName="password" placeholder="******">
+          </div>
+          <span class="error-msg" *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched">
+            Mínimo 8 caracteres (1 Mayúscula y 1 número)
+          </span>
+        </div>
+
+        <ion-item lines="none" style="--background: transparent; margin-top: 15px; margin-bottom: 25px; --padding-start: 0;">
+          <ion-label style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: #11421E;">Estado de acceso</ion-label>
+          <ion-toggle color="success" formControlName="isActive" slot="end"></ion-toggle>
+        </ion-item>
+
+        <button type="submit" class="btn-save" [disabled]="isSaving" style="width: 100%; background: #00A650; color: white; border: none; padding: 18px; border-radius: 12px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(0, 166, 80, 0.3); transition: transform 0.2s; cursor: pointer;">
+          <ion-spinner name="crescent" *ngIf="isSaving" style="height: 20px; --color: white;"></ion-spinner>
+          <ng-container *ngIf="!isSaving">
+            <ion-icon name="save-outline" style="font-size: 1.2rem;"></ion-icon>
+            <span>GUARDAR USUARIO</span>
+          </ng-container>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <style>
+    .custom-input-group { margin-bottom: 18px; }
+    .custom-input-group label { display: block; font-family: 'Montserrat', sans-serif; font-size: 0.75rem; font-weight: 700; color: #6C7A70; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .input-field-form { position: relative; display: flex; align-items: center; }
+    .input-field-form ion-icon { position: absolute; left: 15px; color: #00A650; font-size: 1.1rem; }
+    .input-field-form input { width: 100%; padding: 14px 14px 14px 45px; border: 1.5px solid #EAEEEB; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s; background: #FCFDFD; }
+    .input-field-form input:focus { border-color: #00A650; background: #FFF; }
+    .error-msg { display: block; color: #C62828; font-family: 'Montserrat', sans-serif; font-size: 0.75rem; margin-top: 5px; font-weight: 500; }
+    .btn-save:active { transform: scale(0.97); }
+    .btn-save[disabled] { background: #A0B3A6 !important; box-shadow: none !important; }
+  </style>
+</ion-content>

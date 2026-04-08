@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Gestión de Personas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/personas/new">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Nueva
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar class="search-toolbar">
+    <ion-searchbar 
+      placeholder="Buscar por cédula, nombre o correo..." 
+      [debounce]="500"
+      (ionInput)="onSearch($event)">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="list-container">
+    <div class="empty-state" *ngIf="!isLoading && personas.length === 0">
+      <ion-icon name="people-outline"></ion-icon>
+      <h3>No se encontraron personas</h3>
+      <p>Intenta con otra búsqueda o agrega una nueva persona.</p>
+    </div>
+
+    <ion-list *ngIf="personas.length > 0" lines="full">
+      <ion-item-sliding *ngFor="let persona of personas">
+        <ion-item button [routerLink]="['/personas/edit', persona.id]">
+          <div class="avatar-circle" slot="start">
+            {{ persona.nombre.charAt(0) | uppercase }}{{ persona.apellido.charAt(0) | uppercase }}
+          </div>
+          <ion-label>
+            <h2>{{ persona.nombre }} {{ persona.apellido }}</h2>
+            <p><strong>Cédula:</strong> {{ persona.cedula }}</p>
+            <p *ngIf="persona.email"><ion-icon name="mail-outline"></ion-icon> {{ persona.email }}</p>
+            <p *ngIf="persona.telefono"><ion-icon name="call-outline"></ion-icon> {{ persona.telefono }}</p>
+          </ion-label>
+          <ion-badge [color]="persona.isActive ? 'success' : 'medium'" slot="end">
+            {{ persona.isActive ? 'Activo' : 'Inactivo' }}
+          </ion-badge>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deletePersona(persona)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="!hasNextPage">
+      <ion-infinite-scroll-content loadingText="Cargando más registros..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+</ion-content>

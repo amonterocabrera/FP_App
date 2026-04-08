@@ -1,0 +1,148 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-title">
+        <span class="title-main">Dashboard</span>
+        <span class="title-sub">Resumen General</span>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="dashboard-content">
+  <!-- General Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-card primary">
+      <div class="stat-icon-wrapper">
+        <ion-icon name="people-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <h3>Total Registrados</h3>
+        <p class="stat-number">{{ totalRegistrados | number }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card-row">
+      <div class="stat-card success">
+        <div class="stat-icon-wrapper">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Validados</h3>
+          <p class="stat-number">{{ totalValidados | number }}</p>
+          <div class="progress-bar-minimal">
+            <div class="progress-fill" [style.width.%]="validationPercentage"></div>
+          </div>
+          <p class="stat-percent">{{ validationPercentage }}% del total</p>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-icon-wrapper">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <h3>Pendientes</h3>
+          <p class="stat-number">{{ totalPendientes | number }}</p>
+          <div class="progress-bar-minimal">
+            <div class="progress-fill" [style.width.%]="100 - validationPercentage"></div>
+          </div>
+          <p class="stat-percent">{{ 100 - validationPercentage }}% por validar</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Demographics: Gender & Age -->
+    <div class="dashboard-card demographic-card">
+      <div class="card-header">
+        <ion-icon name="male-female-outline"></ion-icon>
+        <h2>Demografía</h2>
+      </div>
+      
+      <div class="gender-section">
+        <div class="gender-bars">
+          <div class="gender-bar male">
+            <span class="gender-label">Hombres</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="malePercentage"></div>
+            </div>
+            <span class="gender-value">{{ malePercentage }}%</span>
+          </div>
+          <div class="gender-bar female">
+            <span class="gender-label">Mujeres</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="femalePercentage"></div>
+            </div>
+            <span class="gender-value">{{ femalePercentage }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      
+      <div class="age-section">
+        <h3>Por Rango de Edad</h3>
+        <div class="bar-chart">
+          <div class="bar-item" *ngFor="let age of ageRanges">
+            <div class="bar-header">
+              <span class="bar-label">{{ age.label }}</span>
+              <span class="bar-value">{{ age.value | number }}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="age.percentage" [style.background-color]="age.color"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Geographic: Provinces -->
+    <div class="dashboard-card province-card">
+      <div class="card-header">
+        <ion-icon name="map-outline"></ion-icon>
+        <h2>Top 5 Provincias</h2>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-item" *ngFor="let prov of provinceStats">
+          <div class="bar-header">
+            <span class="bar-label">{{ prov.label }}</span>
+            <span class="bar-value">{{ prov.value | number }}</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="prov.percentage" [style.background-color]="prov.color"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recintos / Polling Stations -->
+    <div class="dashboard-card recintos-card">
+      <div class="card-header">
+        <ion-icon name="business-outline"></ion-icon>
+        <h2>Recintos Destacados</h2>
+      </div>
+      <div class="list-container">
+        <div class="list-item" *ngFor="let recinto of recintosStats">
+          <div class="item-icon">
+            <ion-icon name="business-outline"></ion-icon>
+          </div>
+          <div class="item-content">
+            <h4>{{ recinto.name }}</h4>
+            <p>{{ recinto.province }}</p>
+          </div>
+          <div class="item-stats">
+            <span class="user-count">{{ recinto.users | number }} usuarios</span>
+            <div class="progress-circle" [class.high]="recinto.progress >= 80" [class.medium]="recinto.progress < 80">
+              {{ recinto.progress }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

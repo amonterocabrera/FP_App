@@ -1,3 +1,60 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <!-- El split-pane se activa en pantallas grandes (lg), pero si when es string, se aplica esa media-query. 
+       Para deshabilitar condicionalmente, 'false' apaga el split-pane. -->
+  <ion-split-pane contentId="main-content" [when]="isLoggedIn ? 'lg' : false">
+    
+    <ion-menu contentId="main-content" type="overlay" class="institutional-menu" [disabled]="!isLoggedIn" menuId="main-menu">
+      
+      <ion-header class="ion-no-border">
+        <ion-toolbar class="menu-header-toolbar">
+          <div class="user-profile">
+            <ion-avatar class="user-avatar">
+              <div class="avatar-initials">{{ (currentUser?.nombre?.charAt(0) || '') | uppercase }}{{ (currentUser?.apellido?.charAt(0) || '') | uppercase }}</div>
+            </ion-avatar>
+            <div class="user-info">
+              <h2 class="user-name">{{ currentUser?.nombre }} {{ currentUser?.apellido }}</h2>
+              <p class="user-email">{{ currentUser?.email }}</p>
+            </div>
+          </div>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="menu-content">
+        <ion-list lines="none" class="nav-list">
+          
+          <ion-menu-toggle auto-hide="false">
+            <ion-item routerDirection="root" routerLink="/dashboard" routerLinkActive="selected" class="nav-item">
+              <ion-icon slot="start" name="grid-outline"></ion-icon>
+              <ion-label>Dashboard Central</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+
+          <!-- Dynamic Modulos -->
+          <div class="menu-divider" *ngIf="modulos && modulos.length > 0">
+            <span>MÓDULOS DEL SISTEMA</span>
+          </div>
+          
+          <ion-menu-toggle auto-hide="false" *ngFor="let m of modulos">
+            <ion-item routerDirection="root" [routerLink]="m.ruta" routerLinkActive="selected" class="nav-item">
+              <ion-icon slot="start" [name]="m.icono || fallbackIcon"></ion-icon>
+              <ion-label>{{ m.nombre }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+          
+        </ion-list>
+      </ion-content>
+
+      <div class="menu-footer">
+        <ion-item lines="none" button (click)="logout()" class="nav-item logout-item">
+          <ion-icon slot="start" name="log-out-outline" color="danger"></ion-icon>
+          <ion-label color="danger" style="font-weight: 600;">Cerrar Sesión</ion-label>
+        </ion-item>
+      </div>
+
+    </ion-menu>
+    
+    <!-- Main Content Outlet - Siempre usamos un solo RouterOutlet en Ionic para no romper animaciones -->
+    <ion-router-outlet id="main-content" [class.authenticated-outlet]="isLoggedIn"></ion-router-outlet>
+    
+  </ion-split-pane>
 </ion-app>

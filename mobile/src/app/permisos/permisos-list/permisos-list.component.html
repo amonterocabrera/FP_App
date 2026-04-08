@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Gestión de Permisos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/permisos/new">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Nuevo
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="list-container">
+    <ion-spinner *ngIf="isLoading" name="crescent" class="main-spinner"></ion-spinner>
+
+    <div class="empty-state" *ngIf="!isLoading && permisos.length === 0">
+      <ion-icon name="key-outline"></ion-icon>
+      <h3>No hay permisos configurados</h3>
+    </div>
+
+    <!-- Grupos por Módulo -->
+    <ion-accordion-group *ngIf="!isLoading && modulos.length > 0">
+      <ion-accordion *ngFor="let m of modulos" [value]="m.id.toString()">
+        <ion-item slot="header" color="light">
+          <ion-icon [name]="m.icono || 'cube-outline'" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ m.nombre }}</h2>
+            <p>{{ getPermisosByModulo(m.id).length }} permisos registrados</p>
+          </ion-label>
+        </ion-item>
+        
+        <div class="ion-padding" slot="content">
+          <ion-list lines="full" class="permisos-list">
+            <div class="empty-state-mini" *ngIf="getPermisosByModulo(m.id).length === 0">
+              <p>No hay permisos en este módulo</p>
+            </div>
+            
+            <ion-item-sliding *ngFor="let p of getPermisosByModulo(m.id)">
+              <ion-item button [routerLink]="['/permisos/edit', p.id]">
+                <ion-label>
+                  <h3>{{ p.nombre }}</h3>
+                  <p><code>{{ p.clave }}</code> | Acción: {{ getActionName(p.accion) }}</p>
+                </ion-label>
+                <ion-badge [color]="p.isActive ? 'success' : 'medium'" slot="end">
+                  {{ p.isActive ? 'Activo' : 'Inactivo' }}
+                </ion-badge>
+              </ion-item>
+
+              <ion-item-options side="end">
+                <ion-item-option color="danger" (click)="deletePermiso(p)">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-list>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </div>
+</ion-content>

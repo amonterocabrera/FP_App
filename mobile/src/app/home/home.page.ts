@@ -72,7 +72,7 @@ export class HomePage {
               // Si debemos forzar el cambio de password, redireccionar a esa vista
               this.router.navigate(['/change-password'], { replaceUrl: true });
             } else {
-              this.router.navigate(['/users'], { replaceUrl: true });
+              this.router.navigate(['/dashboard'], { replaceUrl: true });
             }
           }, 500);
         } else {

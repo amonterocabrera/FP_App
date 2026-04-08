@@ -1,0 +1,72 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" style="--background: #0A2612; color: white;">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title style="font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;">GESTIÓN DE USUARIOS</ion-title>
+  </ion-toolbar>
+  <ion-toolbar style="--background: #0A2612; padding-bottom: 5px;">
+    <ion-searchbar 
+      (ionInput)="onSearchChange($event)" 
+      placeholder="Buscar por cédula, nombre o correo..."
+      animated="true"
+      color="light">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content style="--background: #F7FAF8;">
+  <ion-refresher slot="fixed" (ionRefresh)="loadUsers($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
+  <ion-list *ngIf="!isLoading" lines="full" style="background: transparent;">
+    <ion-item-sliding *ngFor="let user of users" class="user-item">
+      
+      <ion-item detail="true" (click)="navigateToEdit(user)" style="--background: #ffffff; margin-bottom: 2px;">
+        <ion-avatar slot="start" style="background: #E8F5E9; display: flex; align-items: center; justify-content: center; color: #00A650;">
+          <b style="font-size: 1.2rem; font-family: 'Montserrat', sans-serif;">{{ user.nombre.charAt(0) | uppercase}}</b>
+        </ion-avatar>
+        <ion-label>
+          <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 700; color: #11421E;">{{ user.nombre }} {{ user.apellido }}</h2>
+          <p style="font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: #6C7A70;">{{ user.email }}</p>
+          <p style="font-size: 0.75rem; color: #00A650; font-weight: 600;" *ngIf="user.isActive">Activo</p>
+          <p style="font-size: 0.75rem; color: #C62828; font-weight: 600;" *ngIf="!user.isActive">Inactivo</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="confirmDelete(user)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+      
+    </ion-item-sliding>
+    
+    <div *ngIf="users.length === 0" class="empty-state" style="text-align: center; padding: 40px 20px; color: #6C7A70;">
+      <ion-icon name="person-circle-outline" style="font-size: 4rem; color: #00A650; opacity: 0.5;"></ion-icon>
+      <h3 style="font-family: 'Montserrat', sans-serif; font-weight: 600; margin-top: 15px;">No hay usuarios</h3>
+      <p style="font-size: 0.9rem;">Agrega el primer usuario administrativo al sistema.</p>
+    </div>
+  </ion-list>
+
+  <!-- Skeleton View -->
+  <ion-list *ngIf="isLoading" style="background: transparent;">
+    <ion-item *ngFor="let i of [1,2,3,4,5]" style="--background: #ffffff; margin-bottom: 2px;">
+      <ion-avatar slot="start">
+        <ion-skeleton-text animated></ion-skeleton-text>
+      </ion-avatar>
+      <ion-label>
+        <h3><ion-skeleton-text animated style="width: 60%"></ion-skeleton-text></h3>
+        <p><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" style="margin-bottom: 20px; margin-right: 10px;">
+    <ion-fab-button style="--background: #00A650; --color: white; --box-shadow: 0 4px 15px rgba(0, 166, 80, 0.4);" (click)="navigateToAdd()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

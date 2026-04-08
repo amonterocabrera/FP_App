@@ -1,0 +1,115 @@
+.institutional-menu {
+  --background: #0A2612; /* Verde Oscuro Institucional FP */
+  --width: 280px;
+}
+
+.menu-header-toolbar {
+  --background: transparent;
+  padding: 30px 20px 20px 20px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-avatar {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid #00A650;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-initials {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  color: white;
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.user-email {
+  color: #A0B3A6; /* Verde clarito para texto secundario */
+  margin: 3px 0 0 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+}
+
+.menu-content {
+  --background: #0A2612;
+}
+
+.nav-list {
+  background: transparent;
+  padding: 10px 15px;
+}
+
+.menu-divider {
+  margin: 25px 0 10px 10px;
+  span {
+    color: #4CAF50;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    font-size: 1.1rem;
+  }
+}
+
+.nav-item {
+  --background: transparent;
+  --color: #D1D9D4;
+  --border-radius: 12px;
+  margin-bottom: 5px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  
+  ion-icon {
+    color: #D1D9D4;
+    font-size: 1.4rem;
+  }
+  
+  &.selected {
+    --background: rgba(0, 166, 80, 0.15); /* Fondo verde activo */
+    --color: white;
+    font-weight: 700;
+    
+    ion-icon {
+      color: #00A650;
+    }
+  }
+
+  &.logout-item {
+    --background: rgba(220, 53, 69, 0.05);
+    margin-bottom: 20px;
+  }
+}
+
+.menu-footer {
+  padding: 15px;
+  background: #0A2612;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.authenticated-outlet {
+  ion-content {
+    --background: #F7FAF8; /* Gris muy claro para contrastar el contenido del menú oscuro */
+  }
+}

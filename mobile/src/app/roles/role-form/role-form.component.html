@@ -1,0 +1,115 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="premium-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <ion-buttons slot="start" class="back-btn-container">
+          <ion-back-button defaultHref="/roles" text="" icon="arrow-back-outline"></ion-back-button>
+        </ion-buttons>
+        <div class="logo-text">
+          <img src="assets/fp-logo.png" alt="FP" class="fp-mini-logo"/>
+          <span class="fuerza">Fuerza</span>
+          <span class="del-pueblo">del Pueblo</span>
+        </div>
+      </div>
+      <ion-title class="system-title">GESTIÓN ELECTORAL</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="premium-content">
+  <div class="form-container">
+    <form class="card-glass" [formGroup]="roleForm" (ngSubmit)="save()">
+      <div class="card-title">
+        <ion-icon name="person-add-outline" class="title-icon"></ion-icon>
+        <h2>{{ isEditing ? 'EDITAR ROL' : 'CREAR ROL' }}</h2>
+      </div>
+
+      <div class="form-fields">
+        <!-- Nombre del Rol -->
+        <div class="input-group">
+          <div class="input-icon-wrapper">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <input type="text" placeholder="Nombre del Rol" formControlName="name" />
+        </div>
+
+        <!-- Descripción -->
+        <div class="input-group text-area-group">
+          <div class="input-icon-wrapper">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <textarea placeholder="Descripción" rows="3" formControlName="descripcion"></textarea>
+        </div>
+
+        <!-- Toggle Activo (Solo Edit) -->
+        <div class="input-group toggle-group" *ngIf="isEditing">
+          <ion-label>Estado (Activo)</ion-label>
+          <ion-toggle formControlName="isActive" color="success"></ion-toggle>
+        </div>
+
+        <!-- Permisos Section -->
+        <div class="permissions-section">
+          <h3 class="section-title">ASIGNAR PERMISOS</h3>
+          
+          <div class="modules-list">
+            <ion-accordion-group [multiple]="true" class="premium-accordion">
+              <ion-accordion *ngFor="let item of modulosConPermisos; let i = index" [value]="'acc-'+i" class="module-accordion">
+                <ion-item slot="header" class="module-header">
+                  <ion-icon [name]="item.modulo.icono || 'cube-outline'" slot="start" class="module-icon"></ion-icon>
+                  <ion-label class="module-name">{{ item.modulo.nombre | uppercase }}</ion-label>
+                </ion-item>
+                
+                <div slot="content" class="permissions-content">
+                  <div class="permission-item" *ngFor="let p of item.permisos" (click)="togglePermission(p.id)">
+                    <div class="checkbox-wrapper" [class.checked]="isPermissionSelected(p.id)">
+                      <ion-icon name="checkmark-outline" *ngIf="isPermissionSelected(p.id)"></ion-icon>
+                    </div>
+                    <span>{{ p.nombre | uppercase }}</span>
+                  </div>
+                  <div *ngIf="item.permisos.length === 0" class="no-permissions">
+                    No hay permisos registrados en este módulo.
+                  </div>
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn-primary" [disabled]="isSaving || roleForm.invalid">
+          <ion-spinner name="crescent" *ngIf="isSaving"></ion-spinner>
+          <ng-container *ngIf="!isSaving">
+            <span>GUARDAR CAMBIOS</span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </ng-container>
+        </button>
+        <button type="button" class="btn-secondary" (click)="cancel()">
+          <ion-icon name="close-outline"></ion-icon>
+          <span>CANCELAR</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <footer class="login-footer">
+    <div class="stat-item">
+      <ion-icon name="shield-checkmark-outline" class="stat-icon"></ion-icon>
+      <span class="stat-value">15</span>
+      <span class="stat-label">ROLES</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <ion-icon name="key-outline" class="stat-icon"></ion-icon>
+      <span class="stat-value">120</span>
+      <span class="stat-label">PERMISOS</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <ion-icon name="calendar-outline" class="stat-icon"></ion-icon>
+      <span class="stat-value">2026</span>
+      <span class="stat-label">AÑO ELECTORAL</span>
+    </div>
+  </footer>
+</ion-content>

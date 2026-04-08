@@ -1,0 +1,89 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="premium-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <ion-buttons slot="start" class="back-btn-container">
+          <ion-back-button defaultHref="/modulos" text="" icon="arrow-back-outline"></ion-back-button>
+        </ion-buttons>
+        <div class="logo-text">
+          <img src="assets/fp-logo.png" alt="FP" class="fp-mini-logo"/>
+          <span class="fuerza">Fuerza</span>
+          <span class="del-pueblo">del Pueblo</span>
+        </div>
+      </div>
+      <ion-title class="system-title">GESTIÓN ELECTORAL</ion-title>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="premium-content">
+  <div class="form-container">
+    <form class="card-glass" [formGroup]="moduloForm" (ngSubmit)="save()">
+      <div class="card-title">
+        <ion-icon name="cube-outline" class="title-icon"></ion-icon>
+        <h2>{{ isEditing ? 'EDITAR MÓDULO' : 'CREAR MÓDULO' }}</h2>
+      </div>
+
+      <div class="form-fields">
+        <!-- Nombre del Módulo -->
+        <div class="input-group">
+          <div class="input-icon-wrapper"><ion-icon name="text-outline"></ion-icon></div>
+          <input type="text" placeholder="Nombre (ej. Gestión de Usuarios)" formControlName="nombre" />
+        </div>
+
+        <!-- Ruta -->
+        <div class="input-group">
+          <div class="input-icon-wrapper"><ion-icon name="link-outline"></ion-icon></div>
+          <input type="text" placeholder="Ruta (ej. /users)" formControlName="ruta" />
+        </div>
+
+        <!-- Orden -->
+        <div class="input-group">
+          <div class="input-icon-wrapper"><ion-icon name="list-outline"></ion-icon></div>
+          <input type="number" placeholder="Orden de aparición" formControlName="orden" />
+        </div>
+
+        <!-- Icono -->
+        <div class="input-group">
+          <div class="input-icon-wrapper"><ion-icon name="image-outline"></ion-icon></div>
+          <input type="text" placeholder="Icono Ionicons (ej. people-outline)" formControlName="icono" />
+        </div>
+
+        <!-- Toggle Activo -->
+        <div class="input-group toggle-group" *ngIf="isEditing">
+          <ion-label>Estado (Activo)</ion-label>
+          <ion-toggle formControlName="isActive" color="success"></ion-toggle>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn-primary" [disabled]="isSaving || moduloForm.invalid">
+          <ion-spinner name="crescent" *ngIf="isSaving"></ion-spinner>
+          <ng-container *ngIf="!isSaving">
+            <span>GUARDAR CAMBIOS</span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+          </ng-container>
+        </button>
+        <button type="button" class="btn-secondary" (click)="cancel()">
+          <ion-icon name="close-outline"></ion-icon>
+          <span>CANCELAR</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <footer class="login-footer">
+    <div class="stat-item">
+      <ion-icon name="cube-outline" class="stat-icon"></ion-icon>
+      <span class="stat-value">MÓDULO</span>
+      <span class="stat-label">CONFIGURACIÓN</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <ion-icon name="key-outline" class="stat-icon"></ion-icon>
+      <span class="stat-value">ACCESO</span>
+      <span class="stat-label">SISTEMA</span>
+    </div>
+  </footer>
+</ion-content>

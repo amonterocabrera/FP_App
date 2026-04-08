@@ -1,0 +1,103 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/personas"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditing ? 'Editar Persona' : 'Nueva Persona' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="personaForm.invalid || isSaving">
+        <ion-spinner *ngIf="isSaving" name="dots"></ion-spinner>
+        <ion-icon *ngIf="!isSaving" name="save-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="form-container">
+    <div class="loading-state" *ngIf="isLoading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando información...</p>
+    </div>
+
+    <form [formGroup]="personaForm" *ngIf="!isLoading">
+      
+      <ion-list class="form-list">
+        <ion-list-header>
+          <ion-icon name="id-card-outline"></ion-icon>
+          <ion-label>Datos Personales</ion-label>
+        </ion-list-header>
+
+        <ion-item class="form-field">
+          <ion-icon name="finger-print-outline" slot="start" color="primary"></ion-icon>
+          <ion-input label="Cédula" labelPlacement="floating" formControlName="cedula" type="text" placeholder="Ej: 001-0000000-1"></ion-input>
+        </ion-item>
+        <div class="error-msg" *ngIf="personaForm.get('cedula')?.touched && personaForm.get('cedula')?.hasError('required')">
+          La cédula es obligatoria.
+        </div>
+
+        <div class="row">
+          <ion-item class="form-field half-width">
+            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-input label="Nombre(s)" labelPlacement="floating" formControlName="nombre" type="text"></ion-input>
+          </ion-item>
+
+          <ion-item class="form-field half-width">
+            <ion-input label="Apellido(s)" labelPlacement="floating" formControlName="apellido" type="text"></ion-input>
+          </ion-item>
+        </div>
+        <div class="error-msg" *ngIf="(personaForm.get('nombre')?.touched && personaForm.get('nombre')?.hasError('required')) || (personaForm.get('apellido')?.touched && personaForm.get('apellido')?.hasError('required'))">
+          El nombre y apellido son obligatorios.
+        </div>
+
+        <ion-item class="form-field">
+          <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+          <ion-label position="stacked">Fecha de Nacimiento</ion-label>
+          <ion-datetime-button datetime="datetime"></ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime id="datetime" presentation="date" formControlName="fechaNacimiento"></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+
+        <ion-item class="form-field">
+          <ion-icon name="male-female-outline" slot="start" color="primary"></ion-icon>
+          <ion-select label="Género" labelPlacement="floating" formControlName="genero">
+            <ion-select-option value="M">Masculino</ion-select-option>
+            <ion-select-option value="F">Femenino</ion-select-option>
+            <ion-select-option value="O">Otro</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+
+      <ion-list class="form-list">
+        <ion-list-header>
+          <ion-icon name="call-outline"></ion-icon>
+          <ion-label>Contacto</ion-label>
+        </ion-list-header>
+
+        <ion-item class="form-field">
+          <ion-icon name="call-outline" slot="start" color="primary"></ion-icon>
+          <ion-input label="Teléfono" labelPlacement="floating" formControlName="telefono" type="tel"></ion-input>
+        </ion-item>
+
+        <ion-item class="form-field">
+          <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+          <ion-input label="Correo Electrónico" labelPlacement="floating" formControlName="email" type="email"></ion-input>
+        </ion-item>
+
+        <ion-item class="form-field">
+          <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
+          <ion-input label="Dirección" labelPlacement="floating" formControlName="direccion" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item class="form-field">
+          <ion-icon name="power-outline" slot="start" color="primary"></ion-icon>
+          <ion-toggle formControlName="isActive" justify="space-between">Estado de la persona</ion-toggle>
+        </ion-item>
+      </ion-list>
+
+    </form>
+  </div>
+</ion-content>

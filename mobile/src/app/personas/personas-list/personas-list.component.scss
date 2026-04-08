@@ -90,10 +90,10 @@
 }
 
 .modern-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1.5px solid #e2e8f0;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px; /* Recuadro en vez de círculo */
+  border: 1px solid #cbd5e1;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   background: #f8fafc;
   display: flex;

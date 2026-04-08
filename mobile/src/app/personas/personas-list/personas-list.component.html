@@ -67,7 +67,7 @@
         <ion-item button [routerLink]="['/personas/edit', persona.id]" class="modern-card-item">
           <!-- Real avatar UX Fix with ng-template fallback -->
           <div slot="start" class="modern-avatar-wrapper">
-            <ion-avatar class="modern-avatar">
+            <div class="modern-avatar">
               <img *ngIf="persona.cedula; else fallback" 
                    [src]="getFotoUrl(persona.cedula)" 
                    (error)="handleImageError($event)" />
@@ -82,7 +82,7 @@
               <div class="avatar-fallback fallback-manual" style="display: none;">
                 {{ (persona.nombreCompleto || persona.nombre)?.charAt(0) | uppercase }}
               </div>
-            </ion-avatar>
+            </div>
           </div>
 
           <ion-label class="modern-card-label">

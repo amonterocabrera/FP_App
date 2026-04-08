@@ -6,7 +6,8 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton,
   IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner, IonChip,
   IonList, IonListHeader, IonSelect, IonSelectOption, IonCard, IonCardContent,
-  IonCardHeader, IonCardTitle, IonText, IonAvatar, ToastController, IonCheckbox
+  IonCardHeader, IonCardTitle, IonText, IonAvatar, ToastController, IonCheckbox,
+  IonAccordion, IonAccordionGroup
 } from '@ionic/angular/standalone';
 import { PersonasService } from '../../core/services/personas.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -14,7 +15,8 @@ import { addIcons } from 'ionicons';
 import {
   searchOutline, saveOutline, idCardOutline, personOutline,
   callOutline, mailOutline, mapOutline, addOutline, trashOutline,
-  checkmarkCircleOutline, alertCircleOutline, fingerPrintOutline
+  checkmarkCircleOutline, alertCircleOutline, fingerPrintOutline,
+  createOutline, closeCircle
 } from 'ionicons/icons';
 import { environment } from '../../../environments/environment';
 
@@ -39,7 +41,7 @@ interface PadronCiudadano {
     IonItem, IonLabel, IonInput, IonButton, IonIcon, IonSpinner, IonChip,
     IonList, IonListHeader, IonSelect, IonSelectOption,
     IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonText, IonAvatar,
-    IonCheckbox, CommonModule, ReactiveFormsModule
+    IonCheckbox, IonAccordion, IonAccordionGroup, CommonModule, ReactiveFormsModule
   ]
 })
 export class PersonaFormComponent implements OnInit {
@@ -74,7 +76,8 @@ export class PersonaFormComponent implements OnInit {
     addIcons({
       searchOutline, saveOutline, idCardOutline, personOutline,
       callOutline, mailOutline, mapOutline, addOutline, trashOutline,
-      checkmarkCircleOutline, alertCircleOutline, fingerPrintOutline
+      checkmarkCircleOutline, alertCircleOutline, fingerPrintOutline,
+      createOutline, closeCircle
     });
 
     this.form = this.fb.group({
@@ -108,11 +111,11 @@ export class PersonaFormComponent implements OnInit {
   cedulaChanged(event: any) {
     const val = event.target.value?.trim() || '';
     if (val === '') {
-      this.clearFormState();
+      this.resetForm();
     }
   }
 
-  clearFormState() {
+  resetForm() {
     this.ciudadano = null;
     this.fotoUrl = null;
     this.padronError = null;
@@ -126,6 +129,7 @@ export class PersonaFormComponent implements OnInit {
     
     this.contactos.clear();
     this.form.patchValue({
+      cedula: '', // Limpiamos también la cédula al reiniciar explícitamente el estado
       email: '',
       direccion: '',
       nombre: '',

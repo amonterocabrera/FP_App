@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { identityValidationGuard } from './core/guards/identity-validation.guard';
 import { TabsPage } from './tabs/tabs.page';
 
 export const routes: Routes = [
@@ -13,7 +14,7 @@ export const routes: Routes = [
   {
     path: '',
     component: TabsPage,
-    canActivate: [authGuard],
+    canActivate: [authGuard, identityValidationGuard],
     children: [
       // Tab 1 — Inicio / Dashboard
       {
@@ -141,5 +142,12 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
     ],
+  },
+  
+  // ── Validación de Identidad Obligatoria ────────────────────────────────────
+  {
+    path: 'identity-validation',
+    loadComponent: () => import('./validation/validation.page').then(m => m.ValidationPage),
+    canActivate: [authGuard]
   },
 ];

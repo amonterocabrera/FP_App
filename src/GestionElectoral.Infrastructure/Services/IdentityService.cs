@@ -193,7 +193,8 @@ namespace GestionElectoral.Infrastructure.Services
                 Email = user.Email!,
                 Roles = roles.ToList(),
                 Permisos = permisos,
-                Modulos = modulos
+                Modulos = modulos,
+                IdentityValidationStatus = user.IdentityValidationStatus
             };
         }
 

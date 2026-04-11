@@ -50,6 +50,9 @@ namespace GestionElectoral.Infrastructure
             // 4. Custom Application Services
             services.AddScoped<GestionElectoral.Application.Common.Interfaces.IIdentityService, GestionElectoral.Infrastructure.Services.IdentityService>();
 
+            // 4a. N8n Validation Service (HttpClient)
+            services.AddHttpClient<IN8nValidationService, GestionElectoral.Infrastructure.Services.N8nValidationService>();
+
             // 4b. PadronJCE — solo lectura, Dapper, conexión secundaria
             services.AddTransient<IPadronJceService, GestionElectoral.Infrastructure.Services.PadronJceService>();
 

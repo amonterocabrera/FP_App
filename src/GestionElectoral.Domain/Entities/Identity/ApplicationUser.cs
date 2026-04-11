@@ -22,6 +22,11 @@ namespace GestionElectoral.Domain.Entities.Identity
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
 
+        // Identity Validation
+        public ValidationStatus IdentityValidationStatus { get; set; } = ValidationStatus.Pending;
+        public string? IdentityValidationMessage { get; set; }
+        public DateTime? IdentityValidatedAt { get; set; }
+
         // Auditoría
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public string CreatedBy { get; set; } = string.Empty;

@@ -1,3 +1,5 @@
+using GestionElectoral.Domain.Entities.Identity;
+
 namespace GestionElectoral.Application.Common.Models
 {
     public class AuthResult
@@ -30,6 +32,7 @@ namespace GestionElectoral.Application.Common.Models
         public List<string> Roles { get; set; } = new();
         public List<string> Permisos { get; set; } = new();       // ['usuarios.ver', 'roles.crear', ...]
         public List<ModuloSessionDto> Modulos { get; set; } = new(); // menú dynamic
+        public ValidationStatus IdentityValidationStatus { get; set; } = ValidationStatus.Pending;
     }
 
     public class ModuloSessionDto

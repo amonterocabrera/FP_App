@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { AuthResult, UserSession } from '../models/auth.models';
+import { AuthResult, UserSession, ValidationStatus } from '../models/auth.models';
 import { TokenStorageService } from './token-storage.service';
 import { environment } from '../../../environments/environment';
 
@@ -69,5 +69,16 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user || !user.permisos) return false;
     return user.permisos.includes(permissionKey);
+  }
+
+  public getValidationStatus(): ValidationStatus {
+    const user = this.getCurrentUser();
+    return user?.identityValidationStatus || ValidationStatus.Pending;
+  }
+
+  public verifyIdentityDocument(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('documentImage', file);
+    return this.http.post<any>(`${environment.apiUrl}/identityvalidation/verify`, formData);
   }
 }

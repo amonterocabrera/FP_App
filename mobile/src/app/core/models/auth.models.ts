@@ -1,3 +1,9 @@
+export enum ValidationStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3
+}
+
 export interface UserSession {
   id: string;
   nombre: string;
@@ -6,6 +12,7 @@ export interface UserSession {
   roles: string[];
   permisos: string[];
   modulos: ModuloSession[];
+  identityValidationStatus: ValidationStatus;
 }
 
 export interface ModuloSession {

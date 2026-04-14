@@ -76,9 +76,9 @@ export class AuthService {
     return user?.identityValidationStatus || ValidationStatus.Pending;
   }
 
-  public verifyIdentityDocument(file: File): Observable<any> {
+  public verifyIdentityDocument(front: File): Observable<any> {
     const formData = new FormData();
-    formData.append('documentImage', file);
+    formData.append('documentImageFront', front);
     return this.http.post<any>(`${environment.apiUrl}/identityvalidation/verify`, formData);
   }
 }

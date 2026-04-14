@@ -4,6 +4,7 @@ import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { TokenStorageService } from '../services/token-storage.service';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 let isRefreshing = false;
 const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
@@ -11,6 +12,7 @@ const refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null)
 export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   const tokenService = inject(TokenStorageService);
   const authService = inject(AuthService);
+  const router = inject(Router);
 
   const token = tokenService.getToken();
   let authReq = req;
@@ -28,7 +30,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: H
     catchError((error: HttpErrorResponse) => {
       // 401 Unauthorized usually means token expired
       if (error.status === 401) {
-        return handle401Error(authReq, next, authService, tokenService);
+        return handle401Error(authReq, next, authService, tokenService, router);
       }
       return throwError(() => error);
     })
@@ -39,7 +41,7 @@ function addTokenHeader(request: HttpRequest<any>, token: string) {
   return request.clone({ headers: request.headers.set('Authorization', 'Bearer ' + token) });
 }
 
-function handle401Error(request: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService, tokenService: TokenStorageService) {
+function handle401Error(request: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService, tokenService: TokenStorageService, router: Router) {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshTokenSubject.next(null);
@@ -59,21 +61,21 @@ function handle401Error(request: HttpRequest<any>, next: HttpHandlerFn, authServ
           } else {
             // Refresh failed, logout
             tokenService.signOut();
-            window.location.href = '/home'; // Redirect to login
+            router.navigateByUrl('/home', { replaceUrl: true }); // Prevent white flash
             return throwError(() => new Error('Refresh token invalid'));
           }
         }),
         catchError((err) => {
           isRefreshing = false;
           tokenService.signOut();
-          window.location.href = '/home'; // Redirect to login
+          router.navigateByUrl('/home', { replaceUrl: true }); // Prevent white flash
           return throwError(() => err);
         })
       );
     } else {
        isRefreshing = false;
        tokenService.signOut();
-       window.location.href = '/home';
+       router.navigateByUrl('/home', { replaceUrl: true }); // Prevent white flash
        return throwError(() => new Error('No refresh token'));
     }
   } else {

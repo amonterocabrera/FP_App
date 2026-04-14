@@ -184,12 +184,20 @@ namespace GestionElectoral.Infrastructure.Services
             var roles = await _userManager.GetRolesAsync(user);
             var permisos = await GetPermisosAsync(roles);
             var modulos = await GetModulosAsync(roles);
+            
+            var cedula = "N/A";
+            if (user.PersonaId.HasValue)
+            {
+                var persona = await _db.Set<GestionElectoral.Domain.Entities.Core.Persona>().FindAsync(user.PersonaId.Value);
+                if (persona != null) cedula = persona.Cedula;
+            }
 
             return new UserSessionDto
             {
                 Id = user.Id,
                 Nombre = user.Nombre,
                 Apellido = user.Apellido,
+                Cedula = cedula,
                 Email = user.Email!,
                 Roles = roles.ToList(),
                 Permisos = permisos,

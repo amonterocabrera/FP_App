@@ -27,15 +27,15 @@ namespace GestionElectoral.WebAPI.Controllers
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyIdentity([FromForm] IdentityValidationRequestDto request)
         {
-            if (request.DocumentImage == null || request.DocumentImage.Length == 0)
-                return BadRequest(new { message = "Debe adjuntar una imagen válida del documento." });
+            if (request.DocumentImageFront == null)
+                return BadRequest(new { message = "Debe adjuntar la imagen (frente) de la cédula." });
 
             var allowedTypes = new[] { "image/jpeg", "image/png" };
-            if (!allowedTypes.Contains(request.DocumentImage.ContentType))
+            if (!allowedTypes.Contains(request.DocumentImageFront.ContentType))
                 return BadRequest(new { message = "Solo se permiten imágenes JPEG o PNG." });
 
-            if (request.DocumentImage.Length > 5 * 1024 * 1024)
-                return BadRequest(new { message = "La imagen no puede sobrepasar los 5 MB." });
+            if (request.DocumentImageFront.Length > 5 * 1024 * 1024)
+                return BadRequest(new { message = "Las imágenes no pueden sobrepasar los 5 MB." });
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -51,7 +51,7 @@ namespace GestionElectoral.WebAPI.Controllers
             var validationResponse = await _n8nValidationService.ValidateDocumentAsync(
                 "", // En este proyecto no vemos Cédula a nivel UserManager (puedes inyectar PersonaRepository para sacarla luego si es requerida).
                 $"{currentUser.Nombre} {currentUser.Apellido}",
-                request.DocumentImage
+                request.DocumentImageFront // Validamos el Frente con n8n
             );
 
             if (validationResponse.Success)
@@ -82,6 +82,6 @@ namespace GestionElectoral.WebAPI.Controllers
 
     public class IdentityValidationRequestDto
     {
-        public IFormFile DocumentImage { get; set; } = default!;
+        public IFormFile DocumentImageFront { get; set; } = default!;
     }
 }

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace GestionElectoral.Infrastructure.Services
 {
+
+
     public class N8nValidationService : IN8nValidationService
     {
         private readonly HttpClient _httpClient;

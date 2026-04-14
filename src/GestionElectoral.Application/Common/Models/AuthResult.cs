@@ -28,6 +28,7 @@ namespace GestionElectoral.Application.Common.Models
         public string Id { get; set; } = default!;
         public string Nombre { get; set; } = default!;
         public string Apellido { get; set; } = default!;
+        public string Cedula { get; set; } = default!;
         public string Email { get; set; } = default!;
         public List<string> Roles { get; set; } = new();
         public List<string> Permisos { get; set; } = new();       // ['usuarios.ver', 'roles.crear', ...]

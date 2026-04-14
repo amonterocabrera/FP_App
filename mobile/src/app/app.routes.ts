@@ -147,7 +147,6 @@ export const routes: Routes = [
   // ── Validación de Identidad Obligatoria ────────────────────────────────────
   {
     path: 'identity-validation',
-    loadComponent: () => import('./validation/validation.page').then(m => m.ValidationPage),
-    canActivate: [authGuard]
+    loadComponent: () => import('./validation/validation.page').then(m => m.ValidationPage)
   },
 ];

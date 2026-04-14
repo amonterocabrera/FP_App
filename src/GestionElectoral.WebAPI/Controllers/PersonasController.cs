@@ -52,13 +52,13 @@ namespace GestionElectoral.WebAPI.Controllers
                     ? NotFound(new { error = $"Cédula '{cedula}' no encontrada en el PadronJCE." })
                     : Ok(result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Expone el error de conexión/BD en desarrollo para facilitar diagnóstico
+                // Solo loggear el error internamente (si se dispusiese de ILogger)
+                // Se elimina la exposición de ex.Message para seguridad pasiva
                 return StatusCode(500, new
                 {
-                    error = "Error al consultar el PadronJCE.",
-                    detalle = ex.Message   // quitar en producción
+                    error = "Ha ocurrido un error interno al consultar el padrón. Por favor intente más tarde."
                 });
             }
         }

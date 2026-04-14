@@ -8,6 +8,7 @@ export interface UserSession {
   id: string;
   nombre: string;
   apellido: string;
+  cedula: string;
   email: string;
   roles: string[];
   permisos: string[];
